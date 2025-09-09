@@ -19,21 +19,33 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Trust proxy (required when behind reverse proxy/load balancer)
-app.set('trust proxy', true);
+// Trust proxy configuration (required when behind reverse proxy/load balancer)
+// Configure based on environment
+if (process.env.NODE_ENV === 'production') {
+  // In production, trust only the first proxy (more secure)
+  app.set('trust proxy', 1);
+} else {
+  // In development, be more permissive but still secure
+  app.set('trust proxy', 'loopback');
+}
 
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// Rate limiting
+// Rate limiting with proper proxy handling
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW || '900000'), // 15 minutes
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip validation warnings in development
+  validate: {
+    trustProxy: false,
+    xForwardedForHeader: false
+  }
 });
 app.use(limiter);
 
