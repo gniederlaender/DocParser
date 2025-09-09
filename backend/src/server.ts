@@ -19,6 +19,9 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy (required when behind reverse proxy/load balancer)
+app.set('trust proxy', true);
+
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
