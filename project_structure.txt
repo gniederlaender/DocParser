@@ -1,0 +1,68 @@
+DocParser/
+├── frontend/
+│   ├── public/
+│   │   ├── index.html
+│   │   └── favicon.ico
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── UploadPage.tsx
+│   │   │   ├── DocumentTypeSelector.tsx
+│   │   │   ├── ResultsDisplay.tsx
+│   │   │   ├── LoadingSpinner.tsx
+│   │   │   └── ErrorDisplay.tsx
+│   │   ├── services/
+│   │   │   ├── apiService.ts
+│   │   │   └── fileUploadService.ts
+│   │   ├── types/
+│   │   │   ├── document.ts
+│   │   │   └── api.ts
+│   │   ├── utils/
+│   │   │   ├── validation.ts
+│   │   │   └── constants.ts
+│   │   ├── App.tsx
+│   │   ├── index.tsx
+│   │   └── styles.css
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── tailwind.config.js
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   │   ├── uploadController.ts
+│   │   │   └── documentTypeController.ts
+│   │   ├── services/
+│   │   │   ├── fileService.ts
+│   │   │   ├── llmService.ts
+│   │   │   └── documentTypeService.ts
+│   │   ├── middleware/
+│   │   │   ├── upload.ts
+│   │   │   ├── validation.ts
+│   │   │   └── errorHandler.ts
+│   │   ├── types/
+│   │   │   ├── document.ts
+│   │   │   └── api.ts
+│   │   ├── routes/
+│   │   │   ├── upload.ts
+│   │   │   └── documentTypes.ts
+│   │   ├── config/
+│   │   │   ├── documentTypes.json
+│   │   │   └── prompts/
+│   │   │       ├── invoice.txt
+│   │   │       ├── receipt.txt
+│   │   │       ├── business_card.txt
+│   │   │       └── resume.txt
+│   │   ├── app.ts
+│   │   └── server.ts
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── .env.example
+├── docker/
+│   ├── Dockerfile.frontend
+│   ├── Dockerfile.backend
+│   └── docker-compose.yml
+├── docs/
+│   ├── API_Documentation.md
+│   └── Deployment_Guide.md
+├── .gitignore
+├── README.md
+└── package.json (root)
