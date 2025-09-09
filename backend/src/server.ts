@@ -51,7 +51,11 @@ app.use(limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'http://0.0.0.0:3000',
+    /https?:\/\/.*:3000$/  // Allow any domain on port 3000
+  ],
   credentials: true
 }));
 

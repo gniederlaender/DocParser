@@ -7,8 +7,24 @@ import {
 } from '../types';
 
 // Create axios instance with default config
+const getApiBaseURL = (): string => {
+  // If explicit API URL is set, use it
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // For development, try to determine the backend URL automatically
+  if (process.env.NODE_ENV === 'development') {
+    const currentHost = window.location.hostname;
+    return `http://${currentHost}:3001/api`;
+  }
+  
+  // Fallback
+  return 'http://localhost:3001/api';
+};
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3001/api',
+  baseURL: getApiBaseURL(),
   timeout: 30000, // 30 seconds timeout
   headers: {
     'Content-Type': 'multipart/form-data',
@@ -122,7 +138,11 @@ export class ApiService {
    */
   static async testConnection(): Promise<boolean> {
     try {
-      const response = await axios.get(`${api.defaults.baseURL}/../health`, {
+      const baseURL = getApiBaseURL();
+      const healthURL = baseURL.replace('/api', '/health');
+      console.log('Testing connection to:', healthURL);
+      
+      const response = await axios.get(healthURL, {
         timeout: 5000
       });
       return response.status === 200;
