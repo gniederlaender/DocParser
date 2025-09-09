@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import { documentTypeService } from '../services/documentTypeService';
 import { DocumentTypesResponse } from '../types';
@@ -6,7 +6,7 @@ import { DocumentTypesResponse } from '../types';
 const router = express.Router();
 
 // GET /api/document-types - Get all available document types
-router.get('/document-types', asyncHandler(async (req, res) => {
+router.get('/document-types', asyncHandler(async (req: Request, res: Response) => {
   const documentTypes = documentTypeService.getAllDocumentTypes();
 
   const response: DocumentTypesResponse = {
@@ -18,7 +18,7 @@ router.get('/document-types', asyncHandler(async (req, res) => {
 }));
 
 // GET /api/document-types/:id - Get specific document type
-router.get('/document-types/:id', asyncHandler(async (req, res) => {
+router.get('/document-types/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const documentType = documentTypeService.getDocumentTypeById(id);
 
@@ -40,7 +40,7 @@ router.get('/document-types/:id', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/document-types - Add new document type (admin only)
-router.post('/document-types', asyncHandler(async (req, res) => {
+router.post('/document-types', asyncHandler(async (req: Request, res: Response) => {
   const { id, name, description, supportedFormats, maxFileSize, promptTemplate } = req.body;
 
   // Basic validation
@@ -81,7 +81,7 @@ router.post('/document-types', asyncHandler(async (req, res) => {
 }));
 
 // PUT /api/document-types/:id - Update document type (admin only)
-router.put('/document-types/:id', asyncHandler(async (req, res) => {
+router.put('/document-types/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const updates = req.body;
 
@@ -104,7 +104,7 @@ router.put('/document-types/:id', asyncHandler(async (req, res) => {
 }));
 
 // DELETE /api/document-types/:id - Delete document type (admin only)
-router.delete('/document-types/:id', asyncHandler(async (req, res) => {
+router.delete('/document-types/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {

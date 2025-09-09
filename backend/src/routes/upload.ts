@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import multer from 'multer';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { documentTypeService } from '../services/documentTypeService';
@@ -27,7 +27,7 @@ const upload = multer({
 });
 
 // POST /api/upload - Upload and process document
-router.post('/upload', upload.single('file'), asyncHandler(async (req, res) => {
+router.post('/upload', upload.single('file'), asyncHandler(async (req: Request, res: Response) => {
   const startTime = Date.now();
 
   // Validate request
@@ -140,7 +140,7 @@ router.post('/upload', upload.single('file'), asyncHandler(async (req, res) => {
 }));
 
 // GET /api/upload/stats - Get upload statistics
-router.get('/upload/stats', asyncHandler(async (req, res) => {
+router.get('/upload/stats', asyncHandler(async (req: Request, res: Response) => {
   const stats = fileService.getFileStats();
 
   res.json({
