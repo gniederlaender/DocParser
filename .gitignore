@@ -63,6 +63,10 @@ tmp/
 temp/
 *.tmp
 
+# PM2 logs
+logs/
+*.log
+
 # Cache directories
 .cache/
 .parcel-cache/
