@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'docparser-backend',
-      script: './backend/dist/server.js',
+      script: './dist/server.js',
       cwd: './backend',
       instances: 1,
       exec_mode: 'fork',
@@ -21,9 +21,8 @@ module.exports = {
     },
     {
       name: 'docparser-frontend',
-      script: 'serve',
-      args: '-s build -p 3000',
-      cwd: './frontend',
+      script: './start-frontend.sh',
+      cwd: '.',
       instances: 1,
       exec_mode: 'fork',
       env: {

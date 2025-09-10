@@ -178,8 +178,8 @@ Add your document types:
 #### Option A: Using PM2 (Recommended)
 
 ```bash
-# Install PM2 globally
-sudo npm install -g pm2
+# Install PM2 and serve globally
+sudo npm install -g pm2 serve
 
 # Create PM2 ecosystem file
 nano /opt/docparser/ecosystem.config.js
