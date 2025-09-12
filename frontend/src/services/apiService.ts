@@ -139,7 +139,7 @@ export class ApiService {
   static async testConnection(): Promise<boolean> {
     try {
       const baseURL = getApiBaseURL();
-      const healthURL = baseURL.replace('/api', '/health');
+      const healthURL = window.location.origin + '/health';
       console.log('Testing connection to:', healthURL);
       
       const response = await axios.get(healthURL, {
