@@ -12,6 +12,18 @@
       "promptTemplate": "kaufvertrag_prompt.txt"
     },
     {
+      "id": "angebotsvergleich",
+      "name": "Angebotsvergleich",
+      "description": "Darlehensangebote vergleichen (2-3 Angebote)",
+      "supportedFormats": [
+        "pdf"
+      ],
+      "maxFileSize": 15728640,
+      "promptTemplate": "angebotsvergleich_prompt.txt",
+      "maxFiles": 3,
+      "minFiles": 2
+    },
+    {
       "id": "invoice",
       "name": "Rechnung",
       "description": "Rechnungsdaten extrahieren",
@@ -61,5 +73,5 @@
       "promptTemplate": "resume_prompt.txt"
     }
   ],
-  "lastUpdated": "2025-09-04T20:30:00.000Z"
+  "lastUpdated": "2025-01-27T10:00:00.000Z"
 }

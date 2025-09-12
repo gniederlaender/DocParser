@@ -60,6 +60,16 @@ export class DocumentTypeService {
         promptTemplate: 'kaufvertrag_prompt.txt'
       },
       {
+        id: 'angebotsvergleich',
+        name: 'Angebotsvergleich',
+        description: 'Darlehensangebote vergleichen (2-3 Angebote)',
+        supportedFormats: ['pdf'],
+        maxFileSize: 15 * 1024 * 1024, // 15MB
+        promptTemplate: 'angebotsvergleich_prompt.txt',
+        maxFiles: 3,
+        minFiles: 2
+      },
+      {
         id: 'invoice',
         name: 'Rechnung',
         description: 'Rechnungsdaten extrahieren',
@@ -100,6 +110,10 @@ export class DocumentTypeService {
 
   public getDocumentTypeById(id: string): DocumentType | undefined {
     return this.documentTypes.find(type => type.id === id);
+  }
+
+  public getDocumentType(id: string): DocumentType | undefined {
+    return this.getDocumentTypeById(id);
   }
 
   public validateDocumentType(id: string): boolean {

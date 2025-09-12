@@ -9,6 +9,8 @@ export interface DocumentType {
   supportedFormats: string[];
   maxFileSize: number;
   validationRules?: ValidationRule[];
+  maxFiles?: number;
+  minFiles?: number;
 }
 
 export interface ValidationRule {

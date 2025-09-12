@@ -3,9 +3,12 @@ export interface DocumentType {
   id: string;
   name: string;
   description: string;
+  promptTemplate?: string;
   supportedFormats: string[];
   maxFileSize: number;
   validationRules?: ValidationRule[];
+  maxFiles?: number;
+  minFiles?: number;
 }
 
 export interface ValidationRule {
@@ -25,6 +28,21 @@ export interface UploadResponse {
   success: boolean;
   data?: {
     extractedData: Record<string, any>;
+    documentType: string;
+    processingTime: number;
+    confidence: number;
+  };
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
+export interface ComparisonResponse {
+  success: boolean;
+  data?: {
+    individualOffers: LoanOfferData[];
+    comparison: ComparisonData;
     documentType: string;
     processingTime: number;
     confidence: number;
@@ -148,6 +166,52 @@ export interface KaufvertragData {
   conditions?: string;
 }
 
+export interface LoanOfferData {
+  nominale?: string;
+  kreditbetrag?: string;
+  laufzeit?: string;
+  anzahlRaten?: string;
+  sollzins?: string;
+  fixzinssatz?: string;
+  fixzinssatzBis?: string;
+  gebuehren?: string;
+  monatsrate?: string;
+  gesamtbetrag?: string;
+  anbieter?: string;
+  angebotsdatum?: string;
+  fileName?: string;
+}
+
+export interface ComparisonData {
+  parameters?: string[];
+  offers?: {
+    [offerId: string]: {
+      [parameter: string]: any;
+    };
+  };
+  bestOffer?: {
+    parameter: string;
+    offerId: string;
+    value: any;
+    reason?: string;
+  }[];
+  // Handle nested structure from backend
+  comparison?: {
+    parameters: string[];
+    offers: {
+      [offerId: string]: {
+        [parameter: string]: any;
+      };
+    };
+    bestOffer: {
+      parameter: string;
+      offerId: string;
+      value: any;
+      reason?: string;
+    }[];
+  };
+}
+
 // Error Types
 export enum ErrorCode {
   INVALID_FILE_TYPE = 'INVALID_FILE_TYPE',
@@ -177,13 +241,14 @@ export interface AppState {
 }
 
 // Utility Types
-export type ExtractedData = KaufvertragData | InvoiceData | ReceiptData | BusinessCardData | ResumeData;
+export type ExtractedData = KaufvertragData | InvoiceData | ReceiptData | BusinessCardData | ResumeData | LoanOfferData;
 export type SupportedFormat = 'pdf' | 'png' | 'jpg' | 'jpeg' | 'docx';
 
 // Component Props Types
 export interface UploadPageProps {
   documentTypes: DocumentType[];
   onUpload: (file: File, documentType: string) => Promise<UploadResponse>;
+  onCompare?: (files: File[], documentType: string) => Promise<ComparisonResponse>;
 }
 
 export interface DocumentTypeSelectorProps {

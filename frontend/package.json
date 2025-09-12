@@ -2,6 +2,7 @@
   "name": "docparser-frontend",
   "version": "1.0.0",
   "description": "Document Parser Frontend Application",
+  "homepage": "/app",
   "main": "src/index.tsx",
   "scripts": {
     "start": "react-scripts start",

@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import {
   UploadResponse,
+  ComparisonResponse,
   DocumentTypesResponse,
   DocumentType,
   UploadRequest
@@ -98,6 +99,38 @@ export class ApiService {
   }
 
   /**
+   * Upload and compare multiple documents
+   */
+  static async compareDocuments(files: File[], documentType: string): Promise<ComparisonResponse> {
+    try {
+      const formData = new FormData();
+      
+      // Append all files
+      files.forEach((file, index) => {
+        formData.append('files', file);
+      });
+      
+      formData.append('documentType', documentType);
+
+      const response: AxiosResponse<ComparisonResponse> = await api.post('/upload/compare', formData, {
+        // Upload progress tracking
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = progressEvent.total
+            ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            : 0;
+          console.log(`Comparison upload progress: ${percentCompleted}%`);
+        },
+        timeout: 120000, // 2 minutes for comparison processing
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Comparison upload error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get all available document types
    */
   static async getDocumentTypes(): Promise<DocumentType[]> {
@@ -139,7 +172,7 @@ export class ApiService {
   static async testConnection(): Promise<boolean> {
     try {
       const baseURL = getApiBaseURL();
-      const healthURL = baseURL.replace('/api', '/health');
+      const healthURL = window.location.origin + '/health';
       console.log('Testing connection to:', healthURL);
       
       const response = await axios.get(healthURL, {

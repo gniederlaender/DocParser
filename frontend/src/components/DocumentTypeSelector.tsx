@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Receipt, CreditCard, User, Home } from 'lucide-react';
+import { FileText, Receipt, CreditCard, User, Home, BarChart3 } from 'lucide-react';
 import { DocumentTypeSelectorProps } from '../types';
 
 const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
@@ -11,6 +11,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
     switch (typeId) {
       case 'kaufvertrag':
         return <Home className="h-6 w-6" />;
+      case 'angebotsvergleich':
+        return <BarChart3 className="h-6 w-6" />;
       case 'invoice':
         return <FileText className="h-6 w-6" />;
       case 'receipt':
@@ -32,6 +34,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
     switch (typeId) {
       case 'kaufvertrag':
         return 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100';
+      case 'angebotsvergleich':
+        return 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100';
       case 'invoice':
         return 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100';
       case 'receipt':
@@ -49,6 +53,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
     switch (typeId) {
       case 'kaufvertrag':
         return 'border-emerald-500 bg-emerald-100 text-emerald-800 ring-2 ring-emerald-300';
+      case 'angebotsvergleich':
+        return 'border-indigo-500 bg-indigo-100 text-indigo-800 ring-2 ring-indigo-300';
       case 'invoice':
         return 'border-blue-500 bg-blue-100 text-blue-800 ring-2 ring-blue-300';
       case 'receipt':
@@ -77,7 +83,7 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {documentTypes.map((type) => {
             const isSelected = selectedType === type.id;
-            const isDisabled = type.id !== 'kaufvertrag';
+            const isDisabled = false; // Enable all document types
             const colorClass = isSelected
               ? getSelectedTypeColor(type.id)
               : getTypeColor(type.id, isDisabled);

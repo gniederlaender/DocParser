@@ -7,6 +7,8 @@ export interface DocumentType {
   supportedFormats: string[];
   maxFileSize: number;
   validationRules?: ValidationRule[];
+  maxFiles?: number;
+  minFiles?: number;
 }
 
 export interface ValidationRule {
@@ -22,10 +24,30 @@ export interface UploadRequest {
   documentType: string;
 }
 
+export interface MultiFileUploadRequest {
+  files: Express.Multer.File[];
+  documentType: string;
+}
+
 export interface UploadResponse {
   success: boolean;
   data?: {
     extractedData: Record<string, any>;
+    documentType: string;
+    processingTime: number;
+    confidence: number;
+  };
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
+export interface ComparisonResponse {
+  success: boolean;
+  data?: {
+    individualOffers: LoanOfferData[];
+    comparison: ComparisonData;
     documentType: string;
     processingTime: number;
     confidence: number;
@@ -149,6 +171,36 @@ export interface KaufvertragData {
   conditions?: string;
 }
 
+export interface LoanOfferData {
+  nominale?: string;
+  kreditbetrag?: string;
+  laufzeit?: string;
+  anzahlRaten?: string;
+  sollzins?: string;
+  fixzinssatz?: string;
+  fixzinssatzBis?: string;
+  gebuehren?: string;
+  monatsrate?: string;
+  gesamtbetrag?: string;
+  anbieter?: string;
+  angebotsdatum?: string;
+  fileName?: string;
+}
+
+export interface ComparisonData {
+  parameters: string[];
+  offers: {
+    [offerId: string]: {
+      [parameter: string]: any;
+    };
+  };
+  bestOffer: {
+    parameter: string;
+    offerId: string;
+    value: any;
+  }[];
+}
+
 // Error Types
 export enum ErrorCode {
   INVALID_FILE_TYPE = 'INVALID_FILE_TYPE',
@@ -179,7 +231,7 @@ export interface AppConfig {
 }
 
 // Utility Types
-export type ExtractedData = KaufvertragData | InvoiceData | ReceiptData | BusinessCardData | ResumeData;
+export type ExtractedData = KaufvertragData | InvoiceData | ReceiptData | BusinessCardData | ResumeData | LoanOfferData;
 export type SupportedFormat = 'pdf' | 'png' | 'jpg' | 'jpeg' | 'docx';
 
 // LLM Response Types

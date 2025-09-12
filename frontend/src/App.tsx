@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import UploadPage from './components/UploadPage';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorDisplay from './components/ErrorDisplay';
-import { DocumentType, UploadResponse } from './types';
+import { DocumentType, UploadResponse, ComparisonResponse } from './types';
 import ApiService from './services/apiService';
 
 const App: React.FC = () => {
@@ -44,6 +44,10 @@ const App: React.FC = () => {
 
   const handleUpload = async (file: File, documentType: string): Promise<UploadResponse> => {
     return await ApiService.uploadDocument(file, documentType);
+  };
+
+  const handleCompare = async (files: File[], documentType: string): Promise<ComparisonResponse> => {
+    return await ApiService.compareDocuments(files, documentType);
   };
 
   const handleRetry = () => {
@@ -136,6 +140,7 @@ const App: React.FC = () => {
         <UploadPage
           documentTypes={documentTypes}
           onUpload={handleUpload}
+          onCompare={handleCompare}
         />
       </main>
 
