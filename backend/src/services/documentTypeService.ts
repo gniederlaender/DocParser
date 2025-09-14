@@ -100,6 +100,14 @@ export class DocumentTypeService {
         supportedFormats: ['pdf', 'docx'],
         maxFileSize: 5 * 1024 * 1024, // 5MB
         promptTemplate: 'resume_prompt.txt'
+      },
+      {
+        id: 'haushaltsrechnung',
+        name: 'Haushaltsrechnung',
+        description: 'Bankkontoauszüge analysieren und Transaktionen kategorisieren',
+        supportedFormats: ['pdf'],
+        maxFileSize: 2 * 1024 * 1024, // 2MB
+        promptTemplate: 'haushaltsrechnung_prompt.txt'
       }
     ];
   }
@@ -237,6 +245,78 @@ OPTIONALE FELDER:
 - education: Array der Bildungslaufbahn
 - skills: Array von Fähigkeiten
 - certifications: Array von Zertifizierungen
+
+Geben Sie die Daten als gültiges JSON-Objekt mit diesen exakten Feldnamen zurück.`,
+
+      haushaltsrechnung: `Sie sind ein Experte für die Analyse von Bankkontoauszügen und Haushaltsrechnungen. Ihre Aufgabe ist es, alle Transaktionen zu extrahieren, zu kategorisieren und zusammenzufassen.
+
+WICHTIGE ANWEISUNGEN:
+1. Analysieren Sie ALLE Transaktionen im Dokument (auch über mehrere Seiten)
+2. Summieren Sie Einnahmen und Ausgaben getrennt
+3. Kategorisieren Sie Ausgaben in die 4 Hauptkategorien + Unallocated
+4. Geben Sie für jede Kategorie eine Confidence-Bewertung (0-100) an
+5. Stellen Sie sicher, dass die Summe der Unterkategorien der Gesamtsumme der Ausgaben entspricht
+
+PFLICHTFELDER:
+- period: Zeitraum des Kontoauszugs (z.B. "Januar 2024", "01.01.2024 - 31.01.2024")
+- einnahmen: Objekt mit total (Summe aller Einnahmen) und confidence (0-100)
+- ausgaben: Objekt mit total (Summe aller Ausgaben) und confidence (0-100)
+  - categories: Objekt mit 5 Kategorien (jede mit amount und confidence):
+    - wohnkosten: Miete, Nebenkosten, Strom, Gas, Wasser, Internet, etc.
+    - kreditraten: Kreditraten, Leasingraten, Darlehensraten
+    - versicherungen: Alle Versicherungsbeiträge (Haftpflicht, Hausrat, etc.)
+    - lebenshaltungskosten: Einkaufen, Restaurants, Freizeit, Kleidung, etc.
+    - unallocated: Nicht eindeutig zuordenbare Ausgaben
+- validation: Objekt mit:
+  - totalSumCorrect: true/false (ob die Gesamtsumme korrekt ist)
+  - subCategoriesSumCorrect: true/false (ob Unterkategorien-Summe = Ausgaben-Summe)
+  - overallConfidence: Durchschnittliche Confidence aller Kategorien (0-100)
+
+ZAHLENFORMAT:
+- Alle Beträge als positive Zahlen (auch Ausgaben)
+- Verwenden Sie das englische Zahlenformat für JSON (1234.56, NICHT 1.234,56)
+- Runden Sie auf 2 Dezimalstellen
+- Beispiel: 1234.56 statt 1.234,56
+
+BEISPIEL JSON-STRUKTUR:
+{
+  "period": "Januar 2024",
+  "einnahmen": {
+    "total": 3355.57,
+    "confidence": 95
+  },
+  "ausgaben": {
+    "total": 1841.43,
+    "confidence": 95,
+    "categories": {
+      "wohnkosten": {
+        "amount": 423.00,
+        "confidence": 90
+      },
+      "kreditraten": {
+        "amount": 0.00,
+        "confidence": 100
+      },
+      "versicherungen": {
+        "amount": 200.76,
+        "confidence": 90
+      },
+      "lebenshaltungskosten": {
+        "amount": 1217.67,
+        "confidence": 85
+      },
+      "unallocated": {
+        "amount": 0.00,
+        "confidence": 100
+      }
+    }
+  },
+  "validation": {
+    "totalSumCorrect": true,
+    "subCategoriesSumCorrect": true,
+    "overallConfidence": 90
+  }
+}
 
 Geben Sie die Daten als gültiges JSON-Objekt mit diesen exakten Feldnamen zurück.`
     };

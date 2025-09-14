@@ -201,6 +201,45 @@ export interface ComparisonData {
   }[];
 }
 
+export interface HaushaltsrechnungData {
+  period?: string;
+  einnahmen: {
+    total: number;
+    confidence: number;
+  };
+  ausgaben: {
+    total: number;
+    confidence: number;
+    categories: {
+      wohnkosten: {
+        amount: number;
+        confidence: number;
+      };
+      kreditraten: {
+        amount: number;
+        confidence: number;
+      };
+      versicherungen: {
+        amount: number;
+        confidence: number;
+      };
+      lebenshaltungskosten: {
+        amount: number;
+        confidence: number;
+      };
+      unallocated: {
+        amount: number;
+        confidence: number;
+      };
+    };
+  };
+  validation: {
+    totalSumCorrect: boolean;
+    subCategoriesSumCorrect: boolean;
+    overallConfidence: number;
+  };
+}
+
 // Error Types
 export enum ErrorCode {
   INVALID_FILE_TYPE = 'INVALID_FILE_TYPE',
@@ -231,7 +270,7 @@ export interface AppConfig {
 }
 
 // Utility Types
-export type ExtractedData = KaufvertragData | InvoiceData | ReceiptData | BusinessCardData | ResumeData | LoanOfferData;
+export type ExtractedData = KaufvertragData | InvoiceData | ReceiptData | BusinessCardData | ResumeData | LoanOfferData | HaushaltsrechnungData;
 export type SupportedFormat = 'pdf' | 'png' | 'jpg' | 'jpeg' | 'docx';
 
 // LLM Response Types

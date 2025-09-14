@@ -112,6 +112,14 @@ export class LLMService {
       cleanedResponse = cleanedResponse.replace(/\s*```$/i, '');
       cleanedResponse = cleanedResponse.trim();
 
+      // Extract only the JSON part if there's additional text after the JSON
+      const jsonStart = cleanedResponse.indexOf('{');
+      const jsonEnd = cleanedResponse.lastIndexOf('}');
+      
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        cleanedResponse = cleanedResponse.substring(jsonStart, jsonEnd + 1);
+      }
+
       console.log('🧹 Cleaned LLM response for JSON parsing...');
       
       const parsed = JSON.parse(cleanedResponse);
