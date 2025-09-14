@@ -253,7 +253,7 @@ router.post('/upload/compare', uploadMultiple.array('files', 3), asyncHandler(as
     console.log('🔄 Creating comparison analysis...');
     
     // Read the comparison prompt directly from file
-    const comparisonPromptPath = path.join(__dirname, '../config/prompts/angebotsvergleich_comparison_prompt.txt');
+    const comparisonPromptPath = path.join(__dirname, '../../src/config/prompts/angebotsvergleich_comparison_prompt.txt');
     
     let comparisonPrompt: string;
     try {

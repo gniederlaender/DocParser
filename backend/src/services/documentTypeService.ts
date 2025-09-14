@@ -8,8 +8,8 @@ export class DocumentTypeService {
   private readonly promptsPath: string;
 
   constructor() {
-    this.configPath = path.join(__dirname, '../config/documentTypes.json');
-    this.promptsPath = path.join(__dirname, '../config/prompts');
+    this.configPath = path.join(__dirname, '../../src/config/documentTypes.json');
+    this.promptsPath = path.join(__dirname, '../../src/config/prompts');
     this.loadDocumentTypes();
   }
 
@@ -53,7 +53,7 @@ export class DocumentTypeService {
     return [
       {
         id: 'kaufvertrag',
-        name: 'Kaufvertrag',
+        name: 'Kaufvertraggg',
         description: 'Immobilien-Kaufvertrag Daten extrahieren',
         supportedFormats: ['pdf', 'docx'],
         maxFileSize: 15 * 1024 * 1024, // 15MB
