@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Download, RotateCcw, Copy, CheckCircle, AlertTriangle } from 'lucide-react';
-import { ResultsDisplayProps } from '../types';
+import { ResultsDisplayProps, HaushaltsrechnungData } from '../types';
+import HaushaltsrechnungDisplay from './HaushaltsrechnungDisplay';
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   data,
@@ -13,6 +14,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   onReset
 }) => {
   const [copied, setCopied] = useState(false);
+
+  // Use specialized display for haushaltsrechnung
+  if (documentType === 'haushaltsrechnung' && 'einnahmen' in data && 'ausgaben' in data) {
+    return (
+      <HaushaltsrechnungDisplay
+        data={data as HaushaltsrechnungData}
+        confidence={confidence}
+        processingTime={processingTime}
+        onDownload={onDownload}
+        onReset={onReset}
+      />
+    );
+  }
 
   const handleCopy = async () => {
     try {

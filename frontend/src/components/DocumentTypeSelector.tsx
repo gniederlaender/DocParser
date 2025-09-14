@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Receipt, CreditCard, User, Home, BarChart3 } from 'lucide-react';
+import { FileText, Receipt, CreditCard, User, Home, BarChart3, Calculator } from 'lucide-react';
 import { DocumentTypeSelectorProps } from '../types';
 
 const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
@@ -13,6 +13,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         return <Home className="h-6 w-6" />;
       case 'angebotsvergleich':
         return <BarChart3 className="h-6 w-6" />;
+      case 'haushaltsrechnung':
+        return <Calculator className="h-6 w-6" />;
       case 'invoice':
         return <FileText className="h-6 w-6" />;
       case 'receipt':
@@ -36,6 +38,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         return 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100';
       case 'angebotsvergleich':
         return 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100';
+      case 'haushaltsrechnung':
+        return 'border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100';
       case 'invoice':
         return 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100';
       case 'receipt':
@@ -55,6 +59,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         return 'border-emerald-500 bg-emerald-100 text-emerald-800 ring-2 ring-emerald-300';
       case 'angebotsvergleich':
         return 'border-indigo-500 bg-indigo-100 text-indigo-800 ring-2 ring-indigo-300';
+      case 'haushaltsrechnung':
+        return 'border-cyan-500 bg-cyan-100 text-cyan-800 ring-2 ring-cyan-300';
       case 'invoice':
         return 'border-blue-500 bg-blue-100 text-blue-800 ring-2 ring-blue-300';
       case 'receipt':
@@ -67,6 +73,27 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         return 'border-gray-500 bg-gray-100 text-gray-800 ring-2 ring-gray-300';
     }
   };
+
+  // Define the primary document types (enabled) and their order
+  const primaryTypes = ['kaufvertrag', 'angebotsvergleich', 'haushaltsrechnung'];
+  
+  // Sort document types: primary types first, then disabled ones
+  const sortedDocumentTypes = [...documentTypes].sort((a, b) => {
+    const aIndex = primaryTypes.indexOf(a.id);
+    const bIndex = primaryTypes.indexOf(b.id);
+    
+    // If both are primary types, maintain their order
+    if (aIndex !== -1 && bIndex !== -1) {
+      return aIndex - bIndex;
+    }
+    
+    // Primary types come first
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+    
+    // Non-primary types maintain their original order
+    return 0;
+  });
 
   return (
     <div>
@@ -81,9 +108,9 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {documentTypes.map((type) => {
+          {sortedDocumentTypes.map((type) => {
             const isSelected = selectedType === type.id;
-            const isDisabled = false; // Enable all document types
+            const isDisabled = !primaryTypes.includes(type.id); // Disable non-primary types
             const colorClass = isSelected
               ? getSelectedTypeColor(type.id)
               : getTypeColor(type.id, isDisabled);
