@@ -53,6 +53,25 @@ export interface ComparisonResponse {
   };
 }
 
+export interface RegistrationResponse {
+  success: boolean;
+  data?: {
+    individualOffers: LoanOfferData[];
+    documentType: string;
+    processingTime: number;
+    confidence: number;
+    databaseSave: {
+      success: boolean;
+      savedCount: number;
+      error?: string;
+    };
+  };
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
 export interface DocumentTypesResponse {
   success: boolean;
   data?: DocumentType[];
@@ -174,6 +193,8 @@ export interface LoanOfferData {
   sollzins?: string;
   fixzinssatz?: string;
   fixzinssatzBis?: string;
+  fixzinssatz_in_jahren?: string;
+  effektivzinssatz?: string;
   gebuehren?: string;
   monatsrate?: string;
   gesamtbetrag?: string;

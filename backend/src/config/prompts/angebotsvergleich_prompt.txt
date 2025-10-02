@@ -8,6 +8,7 @@ ERFORDERLICHE FELDER:
 - Sollzins: Der variable Zinssatz (falls vorhanden)
 - Fixzinssatz: Der feste Zinssatz
 - Fixzinssatz bis: Bis wann der Fixzinssatz gilt
+- Effektivzinssatz: Der effektive Jahreszins (falls angegeben)
 - Gebühren: Alle anfallenden Gebühren (Bearbeitungsgebühr, Notarkosten, etc.)
 - Monatsrate: Die monatliche Rate
 - Gesamtbetrag: Der Gesamtbetrag über die gesamte Laufzeit
@@ -30,6 +31,7 @@ Geben Sie die Daten als JSON-Objekt zurück mit folgenden Feldern:
   "sollzins": "string",
   "fixzinssatz": "string",
   "fixzinssatzBis": "string",
+  "effektivzinssatz": "string",
   "gebuehren": "string",
   "monatsrate": "string",
   "gesamtbetrag": "string",

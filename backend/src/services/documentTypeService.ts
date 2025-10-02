@@ -108,6 +108,16 @@ export class DocumentTypeService {
         supportedFormats: ['pdf'],
         maxFileSize: 2 * 1024 * 1024, // 2MB
         promptTemplate: 'haushaltsrechnung_prompt.txt'
+      },
+      {
+        id: 'angebotserfassung',
+        name: 'Angebotserfassung',
+        description: 'Darlehensangebote erfassen und in Datenbank speichern (1-3 Angebote)',
+        supportedFormats: ['pdf'],
+        maxFileSize: 15 * 1024 * 1024, // 15MB
+        promptTemplate: 'angebotsvergleich_prompt.txt',
+        maxFiles: 3,
+        minFiles: 1
       }
     ];
   }

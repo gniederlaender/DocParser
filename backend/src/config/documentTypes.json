@@ -81,6 +81,18 @@
       ],
       "maxFileSize": 2097152,
       "promptTemplate": "haushaltsrechnung_prompt.txt"
+    },
+    {
+      "id": "angebotserfassung",
+      "name": "Angebotserfassung",
+      "description": "Darlehensangebote erfassen und in Datenbank speichern (1-3 Angebote)",
+      "supportedFormats": [
+        "pdf"
+      ],
+      "maxFileSize": 15728640,
+      "promptTemplate": "angebotsvergleich_prompt.txt",
+      "maxFiles": 3,
+      "minFiles": 1
     }
   ],
   "lastUpdated": "2025-01-27T10:00:00.000Z"

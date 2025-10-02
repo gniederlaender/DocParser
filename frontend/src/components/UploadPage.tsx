@@ -5,9 +5,10 @@ import { Upload, FileText, CheckCircle, AlertCircle, Download, RotateCcw } from 
 import DocumentTypeSelector from './DocumentTypeSelector';
 import ResultsDisplay from './ResultsDisplay';
 import LoadingSpinner from './LoadingSpinner';
-import { UploadPageProps, DocumentType, UploadResponse, ComparisonResponse } from '../types';
+import { UploadPageProps, DocumentType, UploadResponse, ComparisonResponse, RegistrationResponse } from '../types';
 import ApiService from '../services/apiService';
 import ComparisonDisplay from './ComparisonDisplay';
+import RegistrationDisplay from './RegistrationDisplay';
 
 const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onCompare }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -18,11 +19,13 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<any>(null);
   const [comparisonResults, setComparisonResults] = useState<ComparisonResponse['data'] | null>(null);
+  const [registrationResults, setRegistrationResults] = useState<RegistrationResponse['data'] | null>(null);
   const [processingTime, setProcessingTime] = useState(0);
   const [confidence, setConfidence] = useState(0);
 
   const selectedType = documentTypes.find(type => type.id === selectedDocumentType);
   const isComparisonType = selectedType?.id === 'angebotsvergleich';
+  const isRegistrationType = selectedType?.id === 'angebotserfassung';
 
   const validateFile = useCallback((file: File): { isValid: boolean; error?: string } => {
     if (!selectedType) {
@@ -37,13 +40,13 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
       return { isValid: false, error: 'Please select a document type first' };
     }
 
-    // Check file count for comparison
-    if (isComparisonType) {
-      if (files.length < (selectedType.minFiles || 2)) {
-        return { isValid: false, error: `Minimum ${selectedType.minFiles || 2} files required for comparison` };
+    // Check file count for comparison or registration
+    if (isComparisonType || isRegistrationType) {
+      if (files.length < (selectedType.minFiles || 1)) {
+        return { isValid: false, error: `Minimum ${selectedType.minFiles || 1} files required` };
       }
       if (files.length > (selectedType.maxFiles || 3)) {
-        return { isValid: false, error: `Maximum ${selectedType.maxFiles || 3} files allowed for comparison` };
+        return { isValid: false, error: `Maximum ${selectedType.maxFiles || 3} files allowed` };
       }
     }
 
@@ -61,8 +64,8 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;
 
-    if (isComparisonType) {
-      // Handle multiple files for comparison
+    if (isComparisonType || isRegistrationType) {
+      // Handle multiple files for comparison or registration
       const validation = validateFiles(acceptedFiles);
       
       if (!validation.isValid) {
@@ -74,7 +77,8 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
       setSelectedFiles(acceptedFiles);
       setSelectedFile(null);
       setError(null);
-      toast.success(`${acceptedFiles.length} files selected for comparison`);
+      const action = isRegistrationType ? 'registration' : 'comparison';
+      toast.success(`${acceptedFiles.length} files selected for ${action}`);
     } else {
       // Handle single file
       const file = acceptedFiles[0];
@@ -90,7 +94,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
       setError(null);
       toast.success(`File "${file.name}" selected successfully`);
     }
-  }, [validateFile, validateFiles, isComparisonType]);
+  }, [validateFile, validateFiles, isComparisonType, isRegistrationType]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -100,8 +104,8 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
         return acc;
       }, {} as Record<string, string[]>)
     } : undefined,
-    multiple: isComparisonType,
-    maxFiles: isComparisonType ? (selectedType?.maxFiles || 3) : 1,
+    multiple: isComparisonType || isRegistrationType,
+    maxFiles: (isComparisonType || isRegistrationType) ? (selectedType?.maxFiles || 3) : 1,
     disabled: !selectedDocumentType
   });
 
@@ -112,6 +116,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
     setError(null);
     setResults(null);
     setComparisonResults(null);
+    setRegistrationResults(null);
   }, []);
 
   const handleSubmit = async () => {
@@ -159,6 +164,56 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
         }
       } catch (err: any) {
         console.error('Comparison error:', err);
+        const errorMessage = err.message || 'An unexpected error occurred';
+        setError(errorMessage);
+        toast.error(errorMessage, { id: toastId });
+      } finally {
+        setIsUploading(false);
+      }
+    } else if (isRegistrationType) {
+      // Handle registration upload
+      if (!selectedFiles.length || !selectedDocumentType) {
+        toast.error('Please select files and document type for registration');
+        return;
+      }
+
+      setIsUploading(true);
+      setError(null);
+      setUploadProgress(0);
+      setRegistrationResults(null);
+
+      const toastId = toast.loading('Processing documents for registration...');
+
+      try {
+        // Simulate progress updates
+        const progressInterval = setInterval(() => {
+          setUploadProgress(prev => Math.min(prev + 3, 90));
+        }, 500);
+
+        const startTime = Date.now();
+        const response: RegistrationResponse = await ApiService.registerDocuments(selectedFiles, selectedDocumentType);
+        const endTime = Date.now();
+
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        setProcessingTime(endTime - startTime);
+
+        if (response.success && response.data) {
+          setRegistrationResults(response.data);
+          setConfidence(response.data.confidence);
+          
+          if (response.data.databaseSave.success) {
+            toast.success(`Documents registered successfully! ${response.data.databaseSave.savedCount} offers saved to database.`, { id: toastId });
+          } else {
+            toast.success('Documents processed successfully, but database save failed. Data is still available for download.', { id: toastId });
+          }
+        } else {
+          const errorMessage = response.error?.message || 'Registration failed';
+          setError(errorMessage);
+          toast.error(errorMessage, { id: toastId });
+        }
+      } catch (err: any) {
+        console.error('Registration error:', err);
         const errorMessage = err.message || 'An unexpected error occurred';
         setError(errorMessage);
         toast.error(errorMessage, { id: toastId });
@@ -214,7 +269,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
   };
 
   const handleDownload = () => {
-    const dataToDownload = comparisonResults || results;
+    const dataToDownload = comparisonResults || registrationResults || results;
     if (!dataToDownload) return;
 
     try {
@@ -243,13 +298,14 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
     setError(null);
     setResults(null);
     setComparisonResults(null);
+    setRegistrationResults(null);
     setUploadProgress(0);
     setProcessingTime(0);
     setConfidence(0);
   };
 
-  const canSubmit = isComparisonType 
-    ? (selectedFiles.length > 0 && selectedDocumentType && !isUploading && !error && onCompare)
+  const canSubmit = (isComparisonType || isRegistrationType)
+    ? (selectedFiles.length > 0 && selectedDocumentType && !isUploading && !error && (isComparisonType ? onCompare : true))
     : (selectedFile && selectedDocumentType && !isUploading && !error);
 
 
@@ -258,6 +314,17 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
     return (
       <ComparisonDisplay
         data={comparisonResults}
+        onDownload={handleDownload}
+        onReset={handleReset}
+      />
+    );
+  }
+
+  // Show registration results
+  if (registrationResults && selectedType) {
+    return (
+      <RegistrationDisplay
+        data={registrationResults}
         onDownload={handleDownload}
         onReset={handleReset}
       />
@@ -342,6 +409,8 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
                     {selectedDocumentType
                       ? (isComparisonType 
                           ? 'Ziehen Sie 2-3 Darlehensangebote hierher oder klicken Sie zum Durchsuchen'
+                          : isRegistrationType
+                          ? 'Ziehen Sie 1-3 Darlehensangebote hierher oder klicken Sie zum Durchsuchen'
                           : 'Ziehen Sie Ihr Dokument hierher oder klicken Sie zum Durchsuchen')
                       : 'Wählen Sie zuerst einen Dokumententyp aus'
                     }
@@ -351,10 +420,10 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
                       Unterstützte Formate: {selectedType?.supportedFormats.join(', ').toUpperCase()}
                       <br />
                       Maximale Größe: {(selectedType?.maxFileSize || 0) / 1024 / 1024}MB
-                      {isComparisonType && (
+                      {(isComparisonType || isRegistrationType) && (
                         <>
                           <br />
-                          Anzahl Dateien: {selectedType?.minFiles || 2} - {selectedType?.maxFiles || 3}
+                          Anzahl Dateien: {selectedType?.minFiles || 1} - {selectedType?.maxFiles || 3}
                         </>
                       )}
                     </p>
@@ -408,12 +477,12 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
             {isUploading ? (
               <>
                 <LoadingSpinner />
-                <span>{isComparisonType ? 'Vergleiche...' : 'Verarbeitung...'}</span>
+                <span>{isComparisonType ? 'Vergleiche...' : isRegistrationType ? 'Erfasse...' : 'Verarbeitung...'}</span>
               </>
             ) : (
               <>
                 <FileText className="h-5 w-5" />
-                <span>{isComparisonType ? 'Angebote vergleichen' : 'Daten extrahieren'}</span>
+                <span>{isComparisonType ? 'Angebote vergleichen' : isRegistrationType ? 'Angebote erfassen' : 'Daten extrahieren'}</span>
               </>
             )}
           </button>

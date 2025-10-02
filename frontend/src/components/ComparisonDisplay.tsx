@@ -51,6 +51,8 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
       'sollzins': 'Sollzins',
       'fixzinssatz': 'Fixzinssatz',
       'fixzinssatzBis': 'Fixzinssatz bis',
+      'fixzinssatz_in_jahren': 'Fixzinssatz in Jahren',
+      'effektivzinssatz': 'Effektivzinssatz',
       'gebuehren': 'Gebühren',
       'monatsrate': 'Monatsrate',
       'gesamtbetrag': 'Gesamtbetrag'

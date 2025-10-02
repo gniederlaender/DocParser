@@ -11,6 +11,7 @@ VERGLEICHSPARAMETER:
 - Sollzins
 - Fixzinssatz
 - Fixzinssatz bis
+- Effektivzinssatz
 - Gebühren
 - Monatsrate
 - Gesamtbetrag
@@ -36,6 +37,7 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
       "sollzins": "string",
       "fixzinssatz": "string",
       "fixzinssatzBis": "string",
+      "effektivzinssatz": "string",
       "gebuehren": "string",
       "monatsrate": "string",
       "gesamtbetrag": "string",
@@ -44,7 +46,7 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
     }
   ],
   "comparison": {
-    "parameters": ["nominale", "kreditbetrag", "laufzeit", "anzahlRaten", "sollzins", "fixzinssatz", "fixzinssatzBis", "gebuehren", "monatsrate", "gesamtbetrag"],
+    "parameters": ["nominale", "kreditbetrag", "laufzeit", "anzahlRaten", "sollzins", "fixzinssatz", "fixzinssatzBis", "effektivzinssatz", "gebuehren", "monatsrate", "gesamtbetrag"],
     "offers": {
       "angebot_1": {
         "nominale": "string",
@@ -54,6 +56,7 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
         "sollzins": "string",
         "fixzinssatz": "string",
         "fixzinssatzBis": "string",
+        "effektivzinssatz": "string",
         "gebuehren": "string",
         "monatsrate": "string",
         "gesamtbetrag": "string"

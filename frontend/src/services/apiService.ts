@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import {
   UploadResponse,
   ComparisonResponse,
+  RegistrationResponse,
   DocumentTypesResponse,
   DocumentType,
   UploadRequest
@@ -126,6 +127,38 @@ export class ApiService {
       return response.data;
     } catch (error: any) {
       console.error('Comparison upload error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Upload and register loan offers in database
+   */
+  static async registerDocuments(files: File[], documentType: string): Promise<RegistrationResponse> {
+    try {
+      const formData = new FormData();
+      
+      // Append all files
+      files.forEach((file, index) => {
+        formData.append('files', file);
+      });
+      
+      formData.append('documentType', documentType);
+
+      const response: AxiosResponse<RegistrationResponse> = await api.post('/upload/register', formData, {
+        // Upload progress tracking
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = progressEvent.total
+            ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            : 0;
+          console.log(`Registration upload progress: ${percentCompleted}%`);
+        },
+        timeout: 120000, // 2 minutes for registration processing
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Registration upload error:', error);
       throw error;
     }
   }

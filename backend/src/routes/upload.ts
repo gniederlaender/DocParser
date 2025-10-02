@@ -6,7 +6,63 @@ import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { documentTypeService } from '../services/documentTypeService';
 import { fileService } from '../services/fileService';
 import { llmService } from '../services/llmService';
-import { UploadResponse, ComparisonResponse, ErrorCode, LoanOfferData, ComparisonData } from '../types';
+import { UploadResponse, ComparisonResponse, RegistrationResponse, ErrorCode, LoanOfferData, ComparisonData } from '../types';
+import { databaseService, LoanOfferRecord } from '../services/databaseService';
+
+// Utility function to calculate years between two dates
+function calculateYearsBetweenDates(startDate: string, endDate: string): string | null {
+  try {
+    // Parse various date formats
+    const parseDate = (dateStr: string): Date | null => {
+      if (!dateStr || dateStr === 'nicht angegeben') return null;
+      
+      // Try different date formats
+      const formats = [
+        /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/, // DD.MM.YYYY
+        /^(\d{4})-(\d{1,2})-(\d{1,2})$/,   // YYYY-MM-DD
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // DD/MM/YYYY
+      ];
+      
+      for (const format of formats) {
+        const match = dateStr.match(format);
+        if (match) {
+          const [, day, month, year] = match;
+          return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        }
+      }
+      
+      // Try direct parsing
+      const parsed = new Date(dateStr);
+      if (!isNaN(parsed.getTime())) {
+        return parsed;
+      }
+      
+      return null;
+    };
+
+    const start = parseDate(startDate);
+    const end = parseDate(endDate);
+    
+    if (!start || !end) return null;
+    
+    // Calculate difference in years
+    const diffTime = end.getTime() - start.getTime();
+    const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25); // Account for leap years
+    
+    // Round to nearest whole number
+    const years = Math.round(diffYears);
+    
+    // Validate reasonable range (0-50 years)
+    if (years >= 0 && years <= 50) {
+      return `${years} Jahre`;
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Error calculating years between dates:', error);
+    return null;
+  }
+}
 
 const router = express.Router();
 
@@ -239,10 +295,14 @@ router.post('/upload/compare', uploadMultiple.array('files', 3), asyncHandler(as
         throw new AppError(`Invalid LLM response: ${validation.error}`, ErrorCode.INVALID_RESPONSE_FORMAT, 500);
       }
 
-      // Add file name to the extracted data
+      // Add file name to the extracted data and calculate fixzinssatz_in_jahren
       const offerData: LoanOfferData = {
         ...validation.parsedData,
-        fileName: file.originalname
+        fileName: file.originalname,
+        fixzinssatz_in_jahren: calculateYearsBetweenDates(
+          validation.parsedData.angebotsdatum || '',
+          validation.parsedData.fixzinssatzBis || ''
+        ) || 'nicht angegeben'
       };
 
       individualOffers.push(offerData);
@@ -326,6 +386,177 @@ router.post('/upload/compare', uploadMultiple.array('files', 3), asyncHandler(as
 
     console.error('Unexpected error during comparison processing:', error);
     throw new AppError('Document comparison failed', ErrorCode.PROCESSING_TIMEOUT, 500);
+  }
+}));
+
+// POST /api/upload/register - Upload and register loan offers in database
+router.post('/upload/register', uploadMultiple.array('files', 3), asyncHandler(async (req: Request, res: Response) => {
+  const startTime = Date.now();
+
+  // Validate request
+  if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+    throw new AppError('No files uploaded', ErrorCode.VALIDATION_ERROR, 400);
+  }
+
+  const { documentType } = req.body;
+  if (!documentType) {
+    throw new AppError('Document type is required', ErrorCode.VALIDATION_ERROR, 400);
+  }
+
+  // Validate document type
+  if (!documentTypeService.validateDocumentType(documentType)) {
+    throw new AppError('Unsupported document type', ErrorCode.UNSUPPORTED_DOCUMENT_TYPE, 400);
+  }
+
+  // Check if document type supports registration
+  const docType = documentTypeService.getDocumentType(documentType);
+  if (!docType || !docType.maxFiles || !docType.minFiles) {
+    throw new AppError('Document type does not support registration', ErrorCode.UNSUPPORTED_DOCUMENT_TYPE, 400);
+  }
+
+  // Validate file count
+  if (req.files.length < docType.minFiles || req.files.length > docType.maxFiles) {
+    throw new AppError(`Document type requires between ${docType.minFiles} and ${docType.maxFiles} files`, ErrorCode.VALIDATION_ERROR, 400);
+  }
+
+  // Validate each file
+  for (const file of req.files) {
+    const fileValidation = documentTypeService.validateFileForDocumentType(file, documentType);
+    if (!fileValidation.isValid) {
+      throw new AppError(`File validation failed: ${fileValidation.error}`, ErrorCode.VALIDATION_ERROR, 400);
+    }
+  }
+
+  try {
+    console.log(`📄 Processing ${req.files.length} ${documentType} documents for registration`);
+
+    const individualOffers: LoanOfferData[] = [];
+    const savedFileNames: string[] = [];
+
+    // Process each file individually
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+      console.log(`📄 Processing document ${i + 1}/${req.files.length}: ${file.originalname}`);
+
+      // Save file temporarily
+      const fileName = await fileService.saveFile(file, documentType);
+      savedFileNames.push(fileName);
+      console.log(`💾 File saved temporarily as: ${fileName}`);
+
+      // Extract text from file
+      console.log('🔍 Extracting text from document...');
+      const documentText = await fileService.extractTextFromFile(fileName);
+      console.log(`📝 Extracted text length: ${documentText.length} characters`);
+
+      // Get prompt template for individual extraction
+      const promptTemplate = documentTypeService.getPromptTemplate(documentType);
+      if (!promptTemplate) {
+        throw new AppError('Prompt template not found for document type', ErrorCode.LLM_SERVICE_ERROR, 500);
+      }
+
+      // Process with LLM
+      console.log('🤖 Sending document to LLM for processing...');
+      const llmResponse = await llmService.getInstance().processDocument(documentText, promptTemplate, documentType);
+
+      if (!llmResponse.success || !llmResponse.data) {
+        throw new AppError('Failed to process document with LLM', ErrorCode.LLM_SERVICE_ERROR, 500);
+      }
+
+      // Validate and parse LLM response
+      const validation = llmService.getInstance().validateLLMResponse(llmResponse.data);
+      if (!validation.isValid) {
+        throw new AppError(`Invalid LLM response: ${validation.error}`, ErrorCode.INVALID_RESPONSE_FORMAT, 500);
+      }
+
+      // Add file name to the extracted data and calculate fixzinssatz_in_jahren
+      const offerData: LoanOfferData = {
+        ...validation.parsedData,
+        fileName: file.originalname,
+        fixzinssatz_in_jahren: calculateYearsBetweenDates(
+          validation.parsedData.angebotsdatum || '',
+          validation.parsedData.fixzinssatzBis || ''
+        ) || 'nicht angegeben'
+      };
+
+      individualOffers.push(offerData);
+      console.log(`✅ Document ${i + 1} processed successfully`);
+    }
+
+    const processingTime = Date.now() - startTime;
+    console.log(`📊 Processing completed - Time: ${processingTime}ms`);
+
+    // Clean up temporary files
+    for (const fileName of savedFileNames) {
+      try {
+        await fileService.deleteFile(fileName);
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup temporary file:', cleanupError);
+      }
+    }
+
+    // Save to database
+    console.log('💾 Saving offers to database...');
+    const dbRecords: LoanOfferRecord[] = individualOffers.map(offer => ({
+      fileName: offer.fileName || 'unknown',
+      anbieter: offer.anbieter,
+      angebotsdatum: offer.angebotsdatum,
+      nominale: offer.nominale,
+      kreditbetrag: offer.kreditbetrag,
+      laufzeit: offer.laufzeit,
+      anzahlRaten: offer.anzahlRaten,
+      sollzins: offer.sollzins,
+      fixzinssatz: offer.fixzinssatz,
+      fixzinssatzBis: offer.fixzinssatzBis,
+      fixzinssatz_in_jahren: offer.fixzinssatz_in_jahren,
+      effektivzinssatz: offer.effektivzinssatz,
+      gebuehren: offer.gebuehren,
+      monatsrate: offer.monatsrate,
+      gesamtbetrag: offer.gesamtbetrag,
+      rawJson: JSON.stringify(offer),
+      processingTime,
+      confidence: 0.95 // High confidence for registration
+    }));
+
+    const dbResult = await databaseService.saveLoanOffers(dbRecords);
+    console.log(`💾 Database save result: ${dbResult.savedCount}/${dbRecords.length} offers saved`);
+
+    const response: RegistrationResponse = {
+      success: true,
+      data: {
+        individualOffers,
+        documentType,
+        processingTime,
+        confidence: 0.95,
+        databaseSave: {
+          success: dbResult.success,
+          savedCount: dbResult.savedCount,
+          error: dbResult.error
+        }
+      }
+    };
+
+    console.log(`Document registration completed: ${documentType} (${processingTime}ms, ${dbResult.savedCount} saved)`);
+    res.json(response);
+
+  } catch (error) {
+    console.error(`❌ Document registration failed for ${documentType}:`, error);
+    
+    // Clean up files if they were saved
+    if (req.files && Array.isArray(req.files)) {
+      try {
+        // Note: In a real implementation, you'd track the saved filenames
+        // For now, we'll rely on the cleanup job
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup files after error:', cleanupError);
+      }
+    }
+
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    console.error('Unexpected error during registration processing:', error);
+    throw new AppError('Document registration failed', ErrorCode.PROCESSING_TIMEOUT, 500);
   }
 }));
 
