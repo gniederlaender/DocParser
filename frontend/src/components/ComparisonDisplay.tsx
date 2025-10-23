@@ -44,17 +44,29 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
 
   const getParameterDisplayName = (param: string): string => {
     const displayNames: { [key: string]: string } = {
-      'nominale': 'Nominale',
       'kreditbetrag': 'Kreditbetrag',
-      'laufzeit': 'Laufzeit',
-      'anzahlRaten': 'Anzahl Raten',
-      'sollzins': 'Sollzins',
+      'auszahlungsbetrag': 'Auszahlungsbetrag',
+      'auszahlungsdatum': 'Auszahlungsdatum',
+      'datum1Rate': 'Datum 1. Rate',
+      'ratenanzahl': 'Ratenanzahl',
+      'kreditende': 'Kreditende',
+      'sondertilgungen': 'Sondertilgungen',
+      'restwert': 'Restwert',
       'fixzinssatz': 'Fixzinssatz',
-      'fixzinssatzBis': 'Fixzinssatz bis',
-      'fixzinssatz_in_jahren': 'Fixzinssatz in Jahren',
+      'fixzinsperiode': 'Fixzinsperiode',
+      'sollzinssatz': 'Anschlusskondition',
       'effektivzinssatz': 'Effektivzinssatz',
-      'gebuehren': 'Gebühren',
-      'monatsrate': 'Monatsrate',
+      'bearbeitungsgebuehr': 'Bearbeitungsgebühr',
+      'schaetzgebuehr': 'Schätzgebühr',
+      'kontofuehrungsgebuehr': 'Kontoführungsgebühr',
+      'kreditpruefkosten': 'Kreditprüfkosten',
+      'vermittlerentgelt': 'Vermittlerentgelt',
+      'grundbucheintragungsgebuehr': 'Grundbucheintragungsgebühr',
+      'grundbuchseingabegebuehr': 'Grundbuchseingabegebühr',
+      'grundbuchsauszug': 'Grundbuchsauszug',
+      'grundbuchsgesuch': 'Grundbuchsgesuch',
+      'legalisierungsgebuehr': 'Legalisierungsgebühr',
+      'gesamtkosten': 'Gesamtkosten',
       'gesamtbetrag': 'Gesamtbetrag'
     };
     return displayNames[param] || param;
@@ -90,8 +102,9 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
                 <div className="space-y-1 text-sm">
                   <div><span className="font-medium">Anbieter:</span> {formatValue(offer.anbieter)}</div>
                   <div><span className="font-medium">Kreditbetrag:</span> {formatValue(offer.kreditbetrag)}</div>
-                  <div><span className="font-medium">Laufzeit:</span> {formatValue(offer.laufzeit)}</div>
-                  <div><span className="font-medium">Monatsrate:</span> {formatValue(offer.monatsrate)}</div>
+                  <div><span className="font-medium">Auszahlungsbetrag:</span> {formatValue(offer.auszahlungsbetrag)}</div>
+                  <div><span className="font-medium">Ratenanzahl:</span> {formatValue(offer.ratenanzahl)}</div>
+                  <div><span className="font-medium">Fixzinssatz:</span> {formatValue(offer.fixzinssatz)}</div>
                 </div>
               </div>
             ))}
@@ -120,6 +133,15 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {(actualComparison.parameters || []).map((parameter: string) => {
+                  // Handle empty rows
+                  if (parameter === '') {
+                    return (
+                      <tr key={`empty-${Math.random()}`} className="h-4">
+                        <td colSpan={individualOffers.length + 2} className="px-4 py-2"></td>
+                      </tr>
+                    );
+                  }
+                  
                   const bestOffer = getBestOfferForParameter(parameter);
                   return (
                     <tr key={parameter} className="hover:bg-gray-50">

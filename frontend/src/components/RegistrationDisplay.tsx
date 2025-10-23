@@ -40,17 +40,29 @@ const RegistrationDisplay: React.FC<RegistrationDisplayProps> = ({ data, onDownl
 
   const getParameterDisplayName = (param: string): string => {
     const displayNames: { [key: string]: string } = {
-      'nominale': 'Nominale',
       'kreditbetrag': 'Kreditbetrag',
-      'laufzeit': 'Laufzeit',
-      'anzahlRaten': 'Anzahl Raten',
-      'sollzins': 'Sollzins',
+      'auszahlungsbetrag': 'Auszahlungsbetrag',
+      'auszahlungsdatum': 'Auszahlungsdatum',
+      'datum1Rate': 'Datum 1. Rate',
+      'ratenanzahl': 'Ratenanzahl',
+      'kreditende': 'Kreditende',
+      'sondertilgungen': 'Sondertilgungen',
+      'restwert': 'Restwert',
       'fixzinssatz': 'Fixzinssatz',
-      'fixzinssatzBis': 'Fixzinssatz bis',
-      'fixzinssatz_in_jahren': 'Fixzinssatz in Jahren',
+      'fixzinsperiode': 'Fixzinsperiode',
+      'sollzinssatz': 'Anschlusskondition',
       'effektivzinssatz': 'Effektivzinssatz',
-      'gebuehren': 'Gebühren',
-      'monatsrate': 'Monatsrate',
+      'bearbeitungsgebuehr': 'Bearbeitungsgebühr',
+      'schaetzgebuehr': 'Schätzgebühr',
+      'kontofuehrungsgebuehr': 'Kontoführungsgebühr',
+      'kreditpruefkosten': 'Kreditprüfkosten',
+      'vermittlerentgelt': 'Vermittlerentgelt',
+      'grundbucheintragungsgebuehr': 'Grundbucheintragungsgebühr',
+      'grundbuchseingabegebuehr': 'Grundbuchseingabegebühr',
+      'grundbuchsauszug': 'Grundbuchsauszug',
+      'grundbuchsgesuch': 'Grundbuchsgesuch',
+      'legalisierungsgebuehr': 'Legalisierungsgebühr',
+      'gesamtkosten': 'Gesamtkosten',
       'gesamtbetrag': 'Gesamtbetrag',
       'anbieter': 'Anbieter',
       'angebotsdatum': 'Angebotsdatum'
@@ -63,9 +75,11 @@ const RegistrationDisplay: React.FC<RegistrationDisplayProps> = ({ data, onDownl
   };
 
   const allParameters = [
-    'anbieter', 'angebotsdatum', 'nominale', 'kreditbetrag', 'laufzeit', 
-    'anzahlRaten', 'sollzins', 'fixzinssatz', 'fixzinssatzBis', 'fixzinssatz_in_jahren', 'effektivzinssatz',
-    'gebuehren', 'monatsrate', 'gesamtbetrag'
+    'anbieter', 'angebotsdatum', 'kreditbetrag', 'auszahlungsbetrag', 'auszahlungsdatum', 'datum1Rate',
+    'ratenanzahl', 'kreditende', 'sondertilgungen', 'restwert', '', 'fixzinssatz', 'fixzinsperiode',
+    'sollzinssatz', 'effektivzinssatz', '', 'bearbeitungsgebuehr', 'schaetzgebuehr', 'kontofuehrungsgebuehr',
+    'kreditpruefkosten', 'vermittlerentgelt', '', 'grundbucheintragungsgebuehr', 'grundbuchseingabegebuehr', 'grundbuchsauszug',
+    'grundbuchsgesuch', 'legalisierungsgebuehr', '', 'gesamtkosten', 'gesamtbetrag'
   ];
 
   return (
@@ -111,6 +125,11 @@ const RegistrationDisplay: React.FC<RegistrationDisplayProps> = ({ data, onDownl
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {allParameters.map((param) => {
+                // Handle empty rows
+                if (param === '') {
+                  return <div key={`empty-${Math.random()}`} className="w-full h-4"></div>;
+                }
+                
                 const value = getParameterValue(offer, param);
                 if (value === null || value === undefined || value === '') return null;
                 

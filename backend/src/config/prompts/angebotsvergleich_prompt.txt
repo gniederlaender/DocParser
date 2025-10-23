@@ -1,17 +1,38 @@
 Sie sind ein Experte für die Extraktion von Daten aus Darlehensangeboten. Analysieren Sie das vorliegende Darlehensangebot und extrahieren Sie die folgenden Informationen:
 
 ERFORDERLICHE FELDER:
-- Nominale: Der Nennbetrag des Darlehens
+
+Kreditdaten:
 - Kreditbetrag: Der tatsächliche Kreditbetrag
-- Laufzeit: Die Laufzeit des Darlehens in Jahren
-- Anzahl der Raten: Die Gesamtanzahl der Ratenzahlungen
-- Sollzins: Der variable Zinssatz (falls vorhanden)
+- Auszahlungsbetrag: Der tatsächlich ausgezahlte Betrag (kann vom Kreditbetrag abweichen)
+- Auszahlungsdatum: Das Datum der Auszahlung
+- Datum 1. Rate: Das Datum der ersten Rate
+- Ratenanzahl: Die Gesamtanzahl der Ratenzahlungen
+- Kreditende / letzte Rate: Das Datum der letzten Rate oder Kreditende
+- Sondertilgungen: Informationen zu Sondertilgungsmöglichkeiten
+- Restwert: Der Restwert am Ende der Laufzeit
+
+Zinskonditionen:
 - Fixzinssatz: Der feste Zinssatz
-- Fixzinssatz bis: Bis wann der Fixzinssatz gilt
+- Fixzinsperiode: Bis wann der Fixzinssatz gilt
+- Sollzinssatz: Der variable Zinssatz (falls vorhanden)
 - Effektivzinssatz: Der effektive Jahreszins (falls angegeben)
-- Gebühren: Alle anfallenden Gebühren (Bearbeitungsgebühr, Notarkosten, etc.)
-- Monatsrate: Die monatliche Rate
-- Gesamtbetrag: Der Gesamtbetrag über die gesamte Laufzeit
+
+Einzelgebühren:
+- Bearbeitungsgebühr: Bearbeitungsgebühr/Processing Fee
+- Schätzgebühr: Gebühr für Schätzung/Gutachten
+- Kontoführungsgebühr: Monatliche Kontoführungsgebühr
+- Kreditprüfkosten: Kosten für Kreditprüfung
+- Vermittlerentgelt: Entgelt für Vermittlung
+- Grundbucheintragungsgebühr: Gebühr für Grundbucheintragung
+- Grundbuchseingabegebühr: Gebühr für Grundbuchseingabe
+- Grundbuchsauszug: Gebühr für Grundbuchsauszug
+- Grundbuchsgesuch: Gebühr für Grundbuchsgesuch
+- Legalisierungsgebühr/Beglaubigungskosten: Gebühren für Legalisierung/Beglaubigung
+
+Gesamtkosten:
+- Gesamtkosten: Alle Kosten zusammengefasst
+- Gesamtbetrag oder Gesamtbelastung: Der Gesamtbetrag über die gesamte Laufzeit
 
 ANWEISUNGEN:
 1. Extrahieren Sie alle verfügbaren Informationen aus dem Dokument
@@ -24,16 +45,29 @@ ANWEISUNGEN:
 AUSGABEFORMAT:
 Geben Sie die Daten als JSON-Objekt zurück mit folgenden Feldern:
 {
-  "nominale": "string",
-  "kreditbetrag": "string", 
-  "laufzeit": "string",
-  "anzahlRaten": "string",
-  "sollzins": "string",
+  "kreditbetrag": "string",
+  "auszahlungsbetrag": "string",
+  "auszahlungsdatum": "string",
+  "datum1Rate": "string",
+  "ratenanzahl": "string",
+  "kreditende": "string",
+  "sondertilgungen": "string",
+  "restwert": "string",
   "fixzinssatz": "string",
-  "fixzinssatzBis": "string",
+  "fixzinsperiode": "string",
+  "sollzinssatz": "string",
   "effektivzinssatz": "string",
-  "gebuehren": "string",
-  "monatsrate": "string",
+  "bearbeitungsgebuehr": "string",
+  "schaetzgebuehr": "string",
+  "kontofuehrungsgebuehr": "string",
+  "kreditpruefkosten": "string",
+  "vermittlerentgelt": "string",
+  "grundbucheintragungsgebuehr": "string",
+  "grundbuchseingabegebuehr": "string",
+  "grundbuchsauszug": "string",
+  "grundbuchsgesuch": "string",
+  "legalisierungsgebuehr": "string",
+  "gesamtkosten": "string",
   "gesamtbetrag": "string",
   "anbieter": "string",
   "angebotsdatum": "string"

@@ -4,17 +4,38 @@ AUFGABE:
 Vergleichen Sie die folgenden Darlehensangebote und erstellen Sie eine strukturierte Vergleichsanalyse.
 
 VERGLEICHSPARAMETER:
-- Nominale
-- Kreditbetrag  
-- Laufzeit
-- Anzahl der Raten
-- Sollzins
+
+Kreditdaten:
+- Kreditbetrag
+- Auszahlungsbetrag
+- Auszahlungsdatum
+- Datum 1. Rate
+- Ratenanzahl
+- Kreditende / letzte Rate
+- Sondertilgungen
+- Restwert
+
+Zinskonditionen:
 - Fixzinssatz
-- Fixzinssatz bis
+- Fixzinsperiode
+- Sollzinssatz
 - Effektivzinssatz
-- Gebühren
-- Monatsrate
-- Gesamtbetrag
+
+Einzelgebühren:
+- Bearbeitungsgebühr
+- Schätzgebühr
+- Kontoführungsgebühr
+- Kreditprüfkosten
+- Vermittlerentgelt
+- Grundbucheintragungsgebühr
+- Grundbuchseingabegebühr
+- Grundbuchsauszug
+- Grundbuchsgesuch
+- Legalisierungsgebühr/Beglaubigungskosten
+
+Gesamtkosten:
+- Gesamtkosten
+- Gesamtbetrag oder Gesamtbelastung
 
 VERGLEICHSLOGIK:
 1. Identifizieren Sie für jeden Parameter das beste Angebot
@@ -30,44 +51,70 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
     {
       "offerId": "angebot_1",
       "fileName": "dateiname_1.pdf",
-      "nominale": "string",
       "kreditbetrag": "string",
-      "laufzeit": "string", 
-      "anzahlRaten": "string",
-      "sollzins": "string",
+      "auszahlungsbetrag": "string",
+      "auszahlungsdatum": "string",
+      "datum1Rate": "string",
+      "ratenanzahl": "string",
+      "kreditende": "string",
+      "sondertilgungen": "string",
+      "restwert": "string",
       "fixzinssatz": "string",
-      "fixzinssatzBis": "string",
+      "fixzinsperiode": "string",
+      "sollzinssatz": "string",
       "effektivzinssatz": "string",
-      "gebuehren": "string",
-      "monatsrate": "string",
+      "bearbeitungsgebuehr": "string",
+      "schaetzgebuehr": "string",
+      "kontofuehrungsgebuehr": "string",
+      "kreditpruefkosten": "string",
+      "vermittlerentgelt": "string",
+      "grundbucheintragungsgebuehr": "string",
+      "grundbuchseingabegebuehr": "string",
+      "grundbuchsauszug": "string",
+      "grundbuchsgesuch": "string",
+      "legalisierungsgebuehr": "string",
+      "gesamtkosten": "string",
       "gesamtbetrag": "string",
       "anbieter": "string",
       "angebotsdatum": "string"
     }
   ],
   "comparison": {
-    "parameters": ["nominale", "kreditbetrag", "laufzeit", "anzahlRaten", "sollzins", "fixzinssatz", "fixzinssatzBis", "effektivzinssatz", "gebuehren", "monatsrate", "gesamtbetrag"],
+    "parameters": ["kreditbetrag", "auszahlungsbetrag", "auszahlungsdatum", "datum1Rate", "ratenanzahl", "kreditende", "sondertilgungen", "restwert", "", "fixzinssatz", "fixzinsperiode", "sollzinssatz", "effektivzinssatz", "", "bearbeitungsgebuehr", "schaetzgebuehr", "kontofuehrungsgebuehr", "kreditpruefkosten", "vermittlerentgelt", "", "grundbucheintragungsgebuehr", "grundbuchseingabegebuehr", "grundbuchsauszug", "grundbuchsgesuch", "legalisierungsgebuehr", "", "gesamtkosten", "gesamtbetrag"],
     "offers": {
       "angebot_1": {
-        "nominale": "string",
         "kreditbetrag": "string",
-        "laufzeit": "string",
-        "anzahlRaten": "string", 
-        "sollzins": "string",
+        "auszahlungsbetrag": "string",
+        "auszahlungsdatum": "string",
+        "datum1Rate": "string",
+        "ratenanzahl": "string",
+        "kreditende": "string",
+        "sondertilgungen": "string",
+        "restwert": "string",
         "fixzinssatz": "string",
-        "fixzinssatzBis": "string",
+        "fixzinsperiode": "string",
+        "sollzinssatz": "string",
         "effektivzinssatz": "string",
-        "gebuehren": "string",
-        "monatsrate": "string",
+        "bearbeitungsgebuehr": "string",
+        "schaetzgebuehr": "string",
+        "kontofuehrungsgebuehr": "string",
+        "kreditpruefkosten": "string",
+        "vermittlerentgelt": "string",
+        "grundbucheintragungsgebuehr": "string",
+        "grundbuchseingabegebuehr": "string",
+        "grundbuchsauszug": "string",
+        "grundbuchsgesuch": "string",
+        "legalisierungsgebuehr": "string",
+        "gesamtkosten": "string",
         "gesamtbetrag": "string"
       }
     },
     "bestOffer": [
       {
-        "parameter": "monatsrate",
+        "parameter": "fixzinssatz",
         "offerId": "angebot_1", 
-        "value": "1.200,00 EUR",
-        "reason": "Niedrigste monatliche Belastung"
+        "value": "2,650% p.a.",
+        "reason": "Niedrigster Fixzinssatz"
       }
     ]
   }

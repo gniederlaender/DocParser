@@ -8,18 +8,39 @@ export interface LoanOfferRecord {
   fileName: string;
   anbieter?: string;
   angebotsdatum?: string;
-  nominale?: string;
+  
+  // Kreditdaten
   kreditbetrag?: string;
-  laufzeit?: string;
-  anzahlRaten?: string;
-  sollzins?: string;
+  auszahlungsbetrag?: string;
+  auszahlungsdatum?: string;
+  datum1Rate?: string;
+  ratenanzahl?: string;
+  kreditende?: string;
+  sondertilgungen?: string;
+  restwert?: string;
+  
+  // Zinskonditionen
   fixzinssatz?: string;
-  fixzinssatzBis?: string;
-  fixzinssatz_in_jahren?: string;
+  fixzinsperiode?: string;
+  sollzinssatz?: string;
   effektivzinssatz?: string;
-  gebuehren?: string;
-  monatsrate?: string;
+  
+  // Einzelgebühren
+  bearbeitungsgebuehr?: string;
+  schaetzgebuehr?: string;
+  kontofuehrungsgebuehr?: string;
+  kreditpruefkosten?: string;
+  vermittlerentgelt?: string;
+  grundbucheintragungsgebuehr?: string;
+  grundbuchseingabegebuehr?: string;
+  grundbuchsauszug?: string;
+  grundbuchsgesuch?: string;
+  legalisierungsgebuehr?: string;
+  
+  // Gesamtkosten
+  gesamtkosten?: string;
   gesamtbetrag?: string;
+  
   rawJson: string;
   processingTime: number;
   confidence: number;
@@ -59,18 +80,39 @@ export class DatabaseService {
         fileName TEXT NOT NULL,
         anbieter TEXT,
         angebotsdatum TEXT,
-        nominale TEXT,
+        
+        -- Kreditdaten
         kreditbetrag TEXT,
-        laufzeit TEXT,
-        anzahlRaten TEXT,
-        sollzins TEXT,
+        auszahlungsbetrag TEXT,
+        auszahlungsdatum TEXT,
+        datum1Rate TEXT,
+        ratenanzahl TEXT,
+        kreditende TEXT,
+        sondertilgungen TEXT,
+        restwert TEXT,
+        
+        -- Zinskonditionen
         fixzinssatz TEXT,
-        fixzinssatzBis TEXT,
-        fixzinssatz_in_jahren TEXT,
+        fixzinsperiode TEXT,
+        sollzinssatz TEXT,
         effektivzinssatz TEXT,
-        gebuehren TEXT,
-        monatsrate TEXT,
+        
+        -- Einzelgebühren
+        bearbeitungsgebuehr TEXT,
+        schaetzgebuehr TEXT,
+        kontofuehrungsgebuehr TEXT,
+        kreditpruefkosten TEXT,
+        vermittlerentgelt TEXT,
+        grundbucheintragungsgebuehr TEXT,
+        grundbuchseingabegebuehr TEXT,
+        grundbuchsauszug TEXT,
+        grundbuchsgesuch TEXT,
+        legalisierungsgebuehr TEXT,
+        
+        -- Gesamtkosten
+        gesamtkosten TEXT,
         gesamtbetrag TEXT,
+        
         rawJson TEXT NOT NULL,
         processingTime INTEGER NOT NULL,
         confidence REAL NOT NULL,
@@ -96,10 +138,12 @@ export class DatabaseService {
 
       const insertSql = `
         INSERT INTO loan_offers (
-          fileName, anbieter, angebotsdatum, nominale, kreditbetrag, laufzeit,
-          anzahlRaten, sollzins, fixzinssatz, fixzinssatzBis, fixzinssatz_in_jahren, effektivzinssatz, gebuehren,
-          monatsrate, gesamtbetrag, rawJson, processingTime, confidence
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          fileName, anbieter, angebotsdatum, kreditbetrag, auszahlungsbetrag, auszahlungsdatum, datum1Rate,
+          ratenanzahl, kreditende, sondertilgungen, restwert, fixzinssatz, fixzinsperiode, sollzinssatz,
+          effektivzinssatz, bearbeitungsgebuehr, schaetzgebuehr, kontofuehrungsgebuehr, kreditpruefkosten,
+          vermittlerentgelt, grundbucheintragungsgebuehr, grundbuchseingabegebuehr, grundbuchsauszug,
+          grundbuchsgesuch, legalisierungsgebuehr, gesamtkosten, gesamtbetrag, rawJson, processingTime, confidence
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       const stmt = db.prepare(insertSql);
@@ -111,17 +155,29 @@ export class DatabaseService {
             offer.fileName,
             offer.anbieter || null,
             offer.angebotsdatum || null,
-            offer.nominale || null,
             offer.kreditbetrag || null,
-            offer.laufzeit || null,
-            offer.anzahlRaten || null,
-            offer.sollzins || null,
+            offer.auszahlungsbetrag || null,
+            offer.auszahlungsdatum || null,
+            offer.datum1Rate || null,
+            offer.ratenanzahl || null,
+            offer.kreditende || null,
+            offer.sondertilgungen || null,
+            offer.restwert || null,
             offer.fixzinssatz || null,
-            offer.fixzinssatzBis || null,
-            offer.fixzinssatz_in_jahren || null,
+            offer.fixzinsperiode || null,
+            offer.sollzinssatz || null,
             offer.effektivzinssatz || null,
-            offer.gebuehren || null,
-            offer.monatsrate || null,
+            offer.bearbeitungsgebuehr || null,
+            offer.schaetzgebuehr || null,
+            offer.kontofuehrungsgebuehr || null,
+            offer.kreditpruefkosten || null,
+            offer.vermittlerentgelt || null,
+            offer.grundbucheintragungsgebuehr || null,
+            offer.grundbuchseingabegebuehr || null,
+            offer.grundbuchsauszug || null,
+            offer.grundbuchsgesuch || null,
+            offer.legalisierungsgebuehr || null,
+            offer.gesamtkosten || null,
             offer.gesamtbetrag || null,
             offer.rawJson,
             offer.processingTime,

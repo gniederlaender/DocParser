@@ -186,18 +186,39 @@ export interface KaufvertragData {
 }
 
 export interface LoanOfferData {
-  nominale?: string;
+  // Kreditdaten
   kreditbetrag?: string;
-  laufzeit?: string;
-  anzahlRaten?: string;
-  sollzins?: string;
+  auszahlungsbetrag?: string;
+  auszahlungsdatum?: string;
+  datum1Rate?: string;
+  ratenanzahl?: string;
+  kreditende?: string;
+  sondertilgungen?: string;
+  restwert?: string;
+  
+  // Zinskonditionen
   fixzinssatz?: string;
-  fixzinssatzBis?: string;
-  fixzinssatz_in_jahren?: string;
+  fixzinsperiode?: string;
+  sollzinssatz?: string;
   effektivzinssatz?: string;
-  gebuehren?: string;
-  monatsrate?: string;
+  
+  // Einzelgebühren
+  bearbeitungsgebuehr?: string;
+  schaetzgebuehr?: string;
+  kontofuehrungsgebuehr?: string;
+  kreditpruefkosten?: string;
+  vermittlerentgelt?: string;
+  grundbucheintragungsgebuehr?: string;
+  grundbuchseingabegebuehr?: string;
+  grundbuchsauszug?: string;
+  grundbuchsgesuch?: string;
+  legalisierungsgebuehr?: string;
+  
+  // Gesamtkosten
+  gesamtkosten?: string;
   gesamtbetrag?: string;
+  
+  // Metadaten
   anbieter?: string;
   angebotsdatum?: string;
   fileName?: string;

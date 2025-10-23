@@ -117,3 +117,7 @@ dist
 # Temporary folders
 tmp/
 temp/
+
+# Database files
+*.db
+austrian_banks_housing_loan.db

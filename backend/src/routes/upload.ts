@@ -295,14 +295,10 @@ router.post('/upload/compare', uploadMultiple.array('files', 3), asyncHandler(as
         throw new AppError(`Invalid LLM response: ${validation.error}`, ErrorCode.INVALID_RESPONSE_FORMAT, 500);
       }
 
-      // Add file name to the extracted data and calculate fixzinssatz_in_jahren
+      // Add file name to the extracted data
       const offerData: LoanOfferData = {
         ...validation.parsedData,
-        fileName: file.originalname,
-        fixzinssatz_in_jahren: calculateYearsBetweenDates(
-          validation.parsedData.angebotsdatum || '',
-          validation.parsedData.fixzinssatzBis || ''
-        ) || 'nicht angegeben'
+        fileName: file.originalname
       };
 
       individualOffers.push(offerData);
@@ -468,14 +464,10 @@ router.post('/upload/register', uploadMultiple.array('files', 3), asyncHandler(a
         throw new AppError(`Invalid LLM response: ${validation.error}`, ErrorCode.INVALID_RESPONSE_FORMAT, 500);
       }
 
-      // Add file name to the extracted data and calculate fixzinssatz_in_jahren
+      // Add file name to the extracted data
       const offerData: LoanOfferData = {
         ...validation.parsedData,
-        fileName: file.originalname,
-        fixzinssatz_in_jahren: calculateYearsBetweenDates(
-          validation.parsedData.angebotsdatum || '',
-          validation.parsedData.fixzinssatzBis || ''
-        ) || 'nicht angegeben'
+        fileName: file.originalname
       };
 
       individualOffers.push(offerData);
@@ -500,17 +492,29 @@ router.post('/upload/register', uploadMultiple.array('files', 3), asyncHandler(a
       fileName: offer.fileName || 'unknown',
       anbieter: offer.anbieter,
       angebotsdatum: offer.angebotsdatum,
-      nominale: offer.nominale,
       kreditbetrag: offer.kreditbetrag,
-      laufzeit: offer.laufzeit,
-      anzahlRaten: offer.anzahlRaten,
-      sollzins: offer.sollzins,
+      auszahlungsbetrag: offer.auszahlungsbetrag,
+      auszahlungsdatum: offer.auszahlungsdatum,
+      datum1Rate: offer.datum1Rate,
+      ratenanzahl: offer.ratenanzahl,
+      kreditende: offer.kreditende,
+      sondertilgungen: offer.sondertilgungen,
+      restwert: offer.restwert,
       fixzinssatz: offer.fixzinssatz,
-      fixzinssatzBis: offer.fixzinssatzBis,
-      fixzinssatz_in_jahren: offer.fixzinssatz_in_jahren,
+      fixzinsperiode: offer.fixzinsperiode,
+      sollzinssatz: offer.sollzinssatz,
       effektivzinssatz: offer.effektivzinssatz,
-      gebuehren: offer.gebuehren,
-      monatsrate: offer.monatsrate,
+      bearbeitungsgebuehr: offer.bearbeitungsgebuehr,
+      schaetzgebuehr: offer.schaetzgebuehr,
+      kontofuehrungsgebuehr: offer.kontofuehrungsgebuehr,
+      kreditpruefkosten: offer.kreditpruefkosten,
+      vermittlerentgelt: offer.vermittlerentgelt,
+      grundbucheintragungsgebuehr: offer.grundbucheintragungsgebuehr,
+      grundbuchseingabegebuehr: offer.grundbuchseingabegebuehr,
+      grundbuchsauszug: offer.grundbuchsauszug,
+      grundbuchsgesuch: offer.grundbuchsgesuch,
+      legalisierungsgebuehr: offer.legalisierungsgebuehr,
+      gesamtkosten: offer.gesamtkosten,
       gesamtbetrag: offer.gesamtbetrag,
       rawJson: JSON.stringify(offer),
       processingTime,
