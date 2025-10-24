@@ -67,7 +67,8 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
       'grundbuchsgesuch': 'Grundbuchsgesuch',
       'legalisierungsgebuehr': 'Legalisierungsgebühr',
       'gesamtkosten': 'Gesamtkosten',
-      'gesamtbetrag': 'Gesamtbetrag'
+      'gesamtbetrag': 'Gesamtbetrag',
+      'monatsrate': 'Monatsrate'
     };
     return displayNames[param] || param;
   };
@@ -132,11 +133,24 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {(actualComparison.parameters || []).map((parameter: string) => {
-                  // Handle empty rows
+                {(actualComparison.parameters || []).map((parameter: any, index: number) => {
+                  // Handle section headers
+                  if (typeof parameter === 'object' && parameter.type === 'section') {
+                    return (
+                      <tr key={`section-${index}`} className="bg-gray-100">
+                        <td colSpan={individualOffers.length + 2} className="px-4 py-3">
+                          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-1">
+                            {parameter.title}
+                          </h3>
+                        </td>
+                      </tr>
+                    );
+                  }
+                  
+                  // Handle empty rows (legacy support)
                   if (parameter === '') {
                     return (
-                      <tr key={`empty-${Math.random()}`} className="h-4">
+                      <tr key={`empty-${index}`} className="h-4">
                         <td colSpan={individualOffers.length + 2} className="px-4 py-2"></td>
                       </tr>
                     );

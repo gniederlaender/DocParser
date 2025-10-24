@@ -516,6 +516,7 @@ router.post('/upload/register', uploadMultiple.array('files', 3), asyncHandler(a
       legalisierungsgebuehr: offer.legalisierungsgebuehr,
       gesamtkosten: offer.gesamtkosten,
       gesamtbetrag: offer.gesamtbetrag,
+      monatsrate: offer.monatsrate,
       rawJson: JSON.stringify(offer),
       processingTime,
       confidence: 0.95 // High confidence for registration

@@ -64,6 +64,7 @@ const RegistrationDisplay: React.FC<RegistrationDisplayProps> = ({ data, onDownl
       'legalisierungsgebuehr': 'Legalisierungsgebühr',
       'gesamtkosten': 'Gesamtkosten',
       'gesamtbetrag': 'Gesamtbetrag',
+      'monatsrate': 'Monatsrate',
       'anbieter': 'Anbieter',
       'angebotsdatum': 'Angebotsdatum'
     };
@@ -75,11 +76,17 @@ const RegistrationDisplay: React.FC<RegistrationDisplayProps> = ({ data, onDownl
   };
 
   const allParameters = [
-    'anbieter', 'angebotsdatum', 'kreditbetrag', 'auszahlungsbetrag', 'auszahlungsdatum', 'datum1Rate',
-    'ratenanzahl', 'kreditende', 'sondertilgungen', 'restwert', '', 'fixzinssatz', 'fixzinsperiode',
-    'sollzinssatz', 'effektivzinssatz', '', 'bearbeitungsgebuehr', 'schaetzgebuehr', 'kontofuehrungsgebuehr',
-    'kreditpruefkosten', 'vermittlerentgelt', '', 'grundbucheintragungsgebuehr', 'grundbuchseingabegebuehr', 'grundbuchsauszug',
-    'grundbuchsgesuch', 'legalisierungsgebuehr', '', 'gesamtkosten', 'gesamtbetrag'
+    { type: 'section', title: 'Anbieter & Grunddaten' },
+    'anbieter', 'angebotsdatum',
+    { type: 'section', title: 'Kreditdaten' },
+    'kreditbetrag', 'auszahlungsbetrag', 'auszahlungsdatum', 'datum1Rate',
+    'ratenanzahl', 'kreditende', 'sondertilgungen', 'restwert', 'monatsrate',
+    { type: 'section', title: 'Zinskonditionen' },
+    'fixzinssatz', 'fixzinsperiode', 'sollzinssatz', 'effektivzinssatz',
+    { type: 'section', title: 'Gebühren & Kosten' },
+    'bearbeitungsgebuehr', 'schaetzgebuehr', 'kontofuehrungsgebuehr', 'kreditpruefkosten',
+    'vermittlerentgelt', 'grundbucheintragungsgebuehr', 'grundbuchseingabegebuehr', 'grundbuchsauszug',
+    'grundbuchsgesuch', 'legalisierungsgebuehr', 'gesamtkosten', 'gesamtbetrag'
   ];
 
   return (
@@ -124,19 +131,26 @@ const RegistrationDisplay: React.FC<RegistrationDisplayProps> = ({ data, onDownl
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {allParameters.map((param) => {
-                // Handle empty rows
-                if (param === '') {
-                  return <div key={`empty-${Math.random()}`} className="w-full h-4"></div>;
+              {allParameters.map((param, index) => {
+                // Handle section headers
+                if (typeof param === 'object' && param.type === 'section') {
+                  return (
+                    <div key={`section-${index}`} className="col-span-full">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-6 first:mt-0 border-b border-gray-300 pb-2">
+                        {param.title}
+                      </h3>
+                    </div>
+                  );
                 }
                 
-                const value = getParameterValue(offer, param);
+                // Handle parameter fields
+                const value = getParameterValue(offer, param as string);
                 if (value === null || value === undefined || value === '') return null;
                 
                 return (
-                  <div key={param} className="bg-gray-50 p-3 rounded-lg">
+                  <div key={param as string} className="bg-gray-50 p-3 rounded-lg">
                     <div className="text-sm font-medium text-gray-700 mb-1">
-                      {getParameterDisplayName(param)}
+                      {getParameterDisplayName(param as string)}
                     </div>
                     <div className="text-sm text-gray-900 font-mono">
                       {formatValue(value)}

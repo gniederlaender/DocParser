@@ -34,6 +34,9 @@ Gesamtkosten:
 - Gesamtkosten: Alle Kosten zusammengefasst
 - Gesamtbetrag oder Gesamtbelastung: Der Gesamtbetrag über die gesamte Laufzeit
 
+Zahlungen:
+- Monatsrate: Die monatliche Rate/Zahlung
+
 ANWEISUNGEN:
 1. Extrahieren Sie alle verfügbaren Informationen aus dem Dokument
 2. Verwenden Sie für fehlende Werte "nicht angegeben"
@@ -69,6 +72,7 @@ Geben Sie die Daten als JSON-Objekt zurück mit folgenden Feldern:
   "legalisierungsgebuehr": "string",
   "gesamtkosten": "string",
   "gesamtbetrag": "string",
+  "monatsrate": "string",
   "anbieter": "string",
   "angebotsdatum": "string"
 }

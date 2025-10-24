@@ -223,6 +223,9 @@ export interface LoanOfferData {
   gesamtkosten?: string;
   gesamtbetrag?: string;
   
+  // Zahlungen
+  monatsrate?: string;
+  
   // Metadaten
   anbieter?: string;
   angebotsdatum?: string;

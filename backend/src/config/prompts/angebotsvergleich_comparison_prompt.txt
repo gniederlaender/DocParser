@@ -37,6 +37,9 @@ Gesamtkosten:
 - Gesamtkosten
 - Gesamtbetrag oder Gesamtbelastung
 
+Zahlungen:
+- Monatsrate
+
 VERGLEICHSLOGIK:
 1. Identifizieren Sie für jeden Parameter das beste Angebot
 2. Berechnen Sie die Gesamtkosten über die gesamte Laufzeit
@@ -75,12 +78,22 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
       "legalisierungsgebuehr": "string",
       "gesamtkosten": "string",
       "gesamtbetrag": "string",
+      "monatsrate": "string",
       "anbieter": "string",
       "angebotsdatum": "string"
     }
   ],
   "comparison": {
-    "parameters": ["kreditbetrag", "auszahlungsbetrag", "auszahlungsdatum", "datum1Rate", "ratenanzahl", "kreditende", "sondertilgungen", "restwert", "", "fixzinssatz", "fixzinsperiode", "sollzinssatz", "effektivzinssatz", "", "bearbeitungsgebuehr", "schaetzgebuehr", "kontofuehrungsgebuehr", "kreditpruefkosten", "vermittlerentgelt", "", "grundbucheintragungsgebuehr", "grundbuchseingabegebuehr", "grundbuchsauszug", "grundbuchsgesuch", "legalisierungsgebuehr", "", "gesamtkosten", "gesamtbetrag"],
+    "parameters": [
+      {"type": "section", "title": "Anbieter & Grunddaten"},
+      "anbieter", "angebotsdatum",
+      {"type": "section", "title": "Kreditdaten"},
+      "kreditbetrag", "auszahlungsbetrag", "auszahlungsdatum", "datum1Rate", "ratenanzahl", "kreditende", "sondertilgungen", "restwert", "monatsrate",
+      {"type": "section", "title": "Zinskonditionen"},
+      "fixzinssatz", "fixzinsperiode", "sollzinssatz", "effektivzinssatz",
+      {"type": "section", "title": "Gebühren & Kosten"},
+      "bearbeitungsgebuehr", "schaetzgebuehr", "kontofuehrungsgebuehr", "kreditpruefkosten", "vermittlerentgelt", "grundbucheintragungsgebuehr", "grundbuchseingabegebuehr", "grundbuchsauszug", "grundbuchsgesuch", "legalisierungsgebuehr", "gesamtkosten", "gesamtbetrag"
+    ],
     "offers": {
       "angebot_1": {
         "kreditbetrag": "string",
@@ -106,7 +119,8 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
         "grundbuchsgesuch": "string",
         "legalisierungsgebuehr": "string",
         "gesamtkosten": "string",
-        "gesamtbetrag": "string"
+        "gesamtbetrag": "string",
+        "monatsrate": "string"
       }
     },
     "bestOffer": [

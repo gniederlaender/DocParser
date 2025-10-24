@@ -41,6 +41,9 @@ export interface LoanOfferRecord {
   gesamtkosten?: string;
   gesamtbetrag?: string;
   
+  // Zahlungen
+  monatsrate?: string;
+  
   rawJson: string;
   processingTime: number;
   confidence: number;
@@ -113,6 +116,9 @@ export class DatabaseService {
         gesamtkosten TEXT,
         gesamtbetrag TEXT,
         
+        -- Zahlungen
+        monatsrate TEXT,
+        
         rawJson TEXT NOT NULL,
         processingTime INTEGER NOT NULL,
         confidence REAL NOT NULL,
@@ -142,8 +148,8 @@ export class DatabaseService {
           ratenanzahl, kreditende, sondertilgungen, restwert, fixzinssatz, fixzinsperiode, sollzinssatz,
           effektivzinssatz, bearbeitungsgebuehr, schaetzgebuehr, kontofuehrungsgebuehr, kreditpruefkosten,
           vermittlerentgelt, grundbucheintragungsgebuehr, grundbuchseingabegebuehr, grundbuchsauszug,
-          grundbuchsgesuch, legalisierungsgebuehr, gesamtkosten, gesamtbetrag, rawJson, processingTime, confidence
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          grundbuchsgesuch, legalisierungsgebuehr, gesamtkosten, gesamtbetrag, monatsrate, rawJson, processingTime, confidence
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       const stmt = db.prepare(insertSql);
@@ -179,6 +185,7 @@ export class DatabaseService {
             offer.legalisierungsgebuehr || null,
             offer.gesamtkosten || null,
             offer.gesamtbetrag || null,
+            offer.monatsrate || null,
             offer.rawJson,
             offer.processingTime,
             offer.confidence
