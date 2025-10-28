@@ -269,5 +269,14 @@ export class DatabaseService {
   }
 }
 
-// Export singleton instance
-export const databaseService = new DatabaseService();
+// Export singleton instance (lazy initialization)
+let databaseServiceInstance: DatabaseService | null = null;
+
+export const databaseService = {
+  getInstance(): DatabaseService {
+    if (!databaseServiceInstance) {
+      databaseServiceInstance = new DatabaseService();
+    }
+    return databaseServiceInstance;
+  }
+};

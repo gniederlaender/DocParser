@@ -522,7 +522,7 @@ router.post('/upload/register', uploadMultiple.array('files', 3), asyncHandler(a
       confidence: 0.95 // High confidence for registration
     }));
 
-    const dbResult = await databaseService.saveLoanOffers(dbRecords);
+    const dbResult = await databaseService.getInstance().saveLoanOffers(dbRecords);
     console.log(`💾 Database save result: ${dbResult.savedCount}/${dbRecords.length} offers saved`);
 
     const response: RegistrationResponse = {
