@@ -5,10 +5,11 @@ import { Upload, FileText, CheckCircle, AlertCircle, Download, RotateCcw } from 
 import DocumentTypeSelector from './DocumentTypeSelector';
 import ResultsDisplay from './ResultsDisplay';
 import LoadingSpinner from './LoadingSpinner';
-import { UploadPageProps, DocumentType, UploadResponse, ComparisonResponse, RegistrationResponse } from '../types';
+import { UploadPageProps, DocumentType, UploadResponse, ComparisonResponse, RegistrationResponse, VerificationResponse } from '../types';
 import ApiService from '../services/apiService';
 import ComparisonDisplay from './ComparisonDisplay';
 import RegistrationDisplay from './RegistrationDisplay';
+import VerificationDisplay from './VerificationDisplay';
 
 const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onCompare }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -20,12 +21,25 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
   const [results, setResults] = useState<any>(null);
   const [comparisonResults, setComparisonResults] = useState<ComparisonResponse['data'] | null>(null);
   const [registrationResults, setRegistrationResults] = useState<RegistrationResponse['data'] | null>(null);
+  const [verificationResults, setVerificationResults] = useState<VerificationResponse['data'] | null>(null);
+  const [verificationFiles, setVerificationFiles] = useState<{ [key: string]: File | null }>({
+    austrian_passport: null,
+    austrian_id_card: null,
+    real_estate_contract: null
+  });
   const [processingTime, setProcessingTime] = useState(0);
   const [confidence, setConfidence] = useState(0);
 
   const selectedType = documentTypes.find(type => type.id === selectedDocumentType);
   const isComparisonType = selectedType?.id === 'angebotsvergleich';
   const isRegistrationType = selectedType?.id === 'angebotserfassung';
+  const isVerificationType = selectedType?.id === 'document_verification';
+
+  const verificationDocumentTypes = [
+    { id: 'austrian_passport', label: 'Österreichischer Reisepass' },
+    { id: 'austrian_id_card', label: 'Österreichische ID-Karte' },
+    { id: 'real_estate_contract', label: 'Immobilien-Kaufvertrag' }
+  ];
 
   const validateFile = useCallback((file: File): { isValid: boolean; error?: string } => {
     if (!selectedType) {
@@ -117,6 +131,12 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
     setResults(null);
     setComparisonResults(null);
     setRegistrationResults(null);
+    setVerificationResults(null);
+    setVerificationFiles({
+      austrian_passport: null,
+      austrian_id_card: null,
+      real_estate_contract: null
+    });
   }, []);
 
   const handleSubmit = async () => {
@@ -220,6 +240,59 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
       } finally {
         setIsUploading(false);
       }
+    } else if (isVerificationType) {
+      // Handle verification upload
+      const documentsToVerify = Object.entries(verificationFiles)
+        .filter(([_, file]) => file !== null)
+        .map(([docType, file]) => ({ file: file!, documentType: docType }));
+
+      if (documentsToVerify.length === 0) {
+        toast.error('Bitte laden Sie mindestens ein Dokument hoch');
+        return;
+      }
+
+      setIsUploading(true);
+      setError(null);
+      setUploadProgress(0);
+      setVerificationResults(null);
+
+      const toastId = toast.loading('Dokumente werden verifiziert...');
+
+      try {
+        // Simulate progress updates
+        const progressInterval = setInterval(() => {
+          setUploadProgress(prev => Math.min(prev + 2, 90));
+        }, 500);
+
+        const startTime = Date.now();
+        const response: VerificationResponse = await ApiService.verifyDocuments(documentsToVerify);
+        const endTime = Date.now();
+
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        setProcessingTime(endTime - startTime);
+
+        if (response.success && response.data) {
+          setVerificationResults(response.data);
+          
+          if (response.data.overallVerified) {
+            toast.success('Alle Dokumente wurden erfolgreich verifiziert!', { id: toastId });
+          } else {
+            toast.success('Verifizierung abgeschlossen. Einige Dokumente konnten nicht vollständig verifiziert werden.', { id: toastId });
+          }
+        } else {
+          const errorMessage = response.error?.message || 'Verifizierung fehlgeschlagen';
+          setError(errorMessage);
+          toast.error(errorMessage, { id: toastId });
+        }
+      } catch (err: any) {
+        console.error('Verification error:', err);
+        const errorMessage = err.message || 'Ein unerwarteter Fehler ist aufgetreten';
+        setError(errorMessage);
+        toast.error(errorMessage, { id: toastId });
+      } finally {
+        setIsUploading(false);
+      }
     } else {
       // Handle single file upload
       if (!selectedFile || !selectedDocumentType) {
@@ -269,7 +342,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
   };
 
   const handleDownload = () => {
-    const dataToDownload = comparisonResults || registrationResults || results;
+    const dataToDownload = verificationResults || comparisonResults || registrationResults || results;
     if (!dataToDownload) return;
 
     try {
@@ -299,12 +372,28 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
     setResults(null);
     setComparisonResults(null);
     setRegistrationResults(null);
+    setVerificationResults(null);
+    setVerificationFiles({
+      austrian_passport: null,
+      austrian_id_card: null,
+      real_estate_contract: null
+    });
     setUploadProgress(0);
     setProcessingTime(0);
     setConfidence(0);
   };
 
-  const canSubmit = (isComparisonType || isRegistrationType)
+  const handleVerificationFileSelect = (docType: string, file: File | null) => {
+    setVerificationFiles(prev => ({
+      ...prev,
+      [docType]: file
+    }));
+    setError(null);
+  };
+
+  const canSubmit = isVerificationType
+    ? (Object.values(verificationFiles).some(file => file !== null) && selectedDocumentType && !isUploading && !error)
+    : (isComparisonType || isRegistrationType)
     ? (selectedFiles.length > 0 && selectedDocumentType && !isUploading && !error && (isComparisonType ? onCompare : true))
     : (selectedFile && selectedDocumentType && !isUploading && !error);
 
@@ -325,6 +414,17 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
     return (
       <RegistrationDisplay
         data={registrationResults}
+        onDownload={handleDownload}
+        onReset={handleReset}
+      />
+    );
+  }
+
+  // Show verification results
+  if (verificationResults && selectedType) {
+    return (
+      <VerificationDisplay
+        data={verificationResults}
         onDownload={handleDownload}
         onReset={handleReset}
       />
@@ -367,72 +467,122 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
         </div>
 
         {/* File Upload Area */}
-        <div className="mb-6">
-          <div
-            {...getRootProps()}
-            className={`dropzone cursor-pointer transition-colors duration-200 ${
-              isDragActive ? 'dropzone-active' : ''
-            } ${!selectedDocumentType ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            <input {...getInputProps()} />
-            <div className="flex flex-col items-center">
-              {selectedFile || selectedFiles.length > 0 ? (
-                <>
-                  <CheckCircle className="h-12 w-12 text-success-500 mb-4" />
-                  <p className="text-lg font-medium text-success-700 mb-2">
-                    {isComparisonType ? `${selectedFiles.length} Dateien ausgewählt` : 'Datei ausgewählt'}
-                  </p>
-                  <div className="text-center">
-                    {isComparisonType ? (
-                      <div className="space-y-2">
-                        {selectedFiles.map((file, index) => (
-                          <div key={index} className="text-sm">
-                            <p className="font-medium text-gray-900">{file.name}</p>
-                            <p className="text-gray-500">{ApiService.formatFileSize(file.size)}</p>
-                          </div>
-                        ))}
+        {isVerificationType ? (
+          <div className="mb-6 space-y-4">
+            <p className="text-sm text-gray-600 mb-4">
+              Laden Sie die entsprechenden Dokumente für jeden Typ hoch:
+            </p>
+            {verificationDocumentTypes.map((docType) => {
+              const file = verificationFiles[docType.id];
+              return (
+                <div key={docType.id} className="border border-gray-200 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {docType.label}
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    onChange={(e) => {
+                      const selectedFile = e.target.files?.[0] || null;
+                      handleVerificationFileSelect(docType.id, selectedFile);
+                    }}
+                    className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-md file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-primary-50 file:text-primary-700
+                      hover:file:bg-primary-100
+                      cursor-pointer"
+                  />
+                  {file && (
+                    <div className="mt-2 flex items-center justify-between p-2 bg-success-50 rounded">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="h-5 w-5 text-success-600" />
+                        <span className="text-sm font-medium text-success-900">{file.name}</span>
+                        <span className="text-xs text-gray-500">
+                          ({ApiService.formatFileSize(file.size)})
+                        </span>
                       </div>
-                    ) : (
-                      <>
-                        <p className="font-medium text-gray-900">{selectedFile?.name}</p>
-                        <p className="text-sm text-gray-500">
-                          {selectedFile && ApiService.formatFileSize(selectedFile.size)}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Upload className="h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-lg font-medium text-gray-900 mb-2">
-                    {selectedDocumentType
-                      ? (isComparisonType 
-                          ? 'Ziehen Sie 2-3 Darlehensangebote hierher oder klicken Sie zum Durchsuchen'
-                          : isRegistrationType
-                          ? 'Ziehen Sie 1-3 Darlehensangebote hierher oder klicken Sie zum Durchsuchen'
-                          : 'Ziehen Sie Ihr Dokument hierher oder klicken Sie zum Durchsuchen')
-                      : 'Wählen Sie zuerst einen Dokumententyp aus'
-                    }
-                  </p>
-                  {selectedDocumentType && (
-                    <p className="text-sm text-gray-500">
-                      Unterstützte Formate: {selectedType?.supportedFormats.join(', ').toUpperCase()}
-                      <br />
-                      Maximale Größe: {(selectedType?.maxFileSize || 0) / 1024 / 1024}MB
-                      {(isComparisonType || isRegistrationType) && (
+                      <button
+                        onClick={() => handleVerificationFileSelect(docType.id, null)}
+                        className="text-error-600 hover:text-error-800 text-sm"
+                      >
+                        Entfernen
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="mb-6">
+            <div
+              {...getRootProps()}
+              className={`dropzone cursor-pointer transition-colors duration-200 ${
+                isDragActive ? 'dropzone-active' : ''
+              } ${!selectedDocumentType ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <input {...getInputProps()} />
+              <div className="flex flex-col items-center">
+                {selectedFile || selectedFiles.length > 0 ? (
+                  <>
+                    <CheckCircle className="h-12 w-12 text-success-500 mb-4" />
+                    <p className="text-lg font-medium text-success-700 mb-2">
+                      {isComparisonType ? `${selectedFiles.length} Dateien ausgewählt` : 'Datei ausgewählt'}
+                    </p>
+                    <div className="text-center">
+                      {isComparisonType ? (
+                        <div className="space-y-2">
+                          {selectedFiles.map((file, index) => (
+                            <div key={index} className="text-sm">
+                              <p className="font-medium text-gray-900">{file.name}</p>
+                              <p className="text-gray-500">{ApiService.formatFileSize(file.size)}</p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
                         <>
-                          <br />
-                          Anzahl Dateien: {selectedType?.minFiles || 1} - {selectedType?.maxFiles || 3}
+                          <p className="font-medium text-gray-900">{selectedFile?.name}</p>
+                          <p className="text-sm text-gray-500">
+                            {selectedFile && ApiService.formatFileSize(selectedFile.size)}
+                          </p>
                         </>
                       )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-12 w-12 text-gray-400 mb-4" />
+                    <p className="text-lg font-medium text-gray-900 mb-2">
+                      {selectedDocumentType
+                        ? (isComparisonType 
+                            ? 'Ziehen Sie 2-3 Darlehensangebote hierher oder klicken Sie zum Durchsuchen'
+                            : isRegistrationType
+                            ? 'Ziehen Sie 1-3 Darlehensangebote hierher oder klicken Sie zum Durchsuchen'
+                            : 'Ziehen Sie Ihr Dokument hierher oder klicken Sie zum Durchsuchen')
+                        : 'Wählen Sie zuerst einen Dokumententyp aus'
+                      }
                     </p>
-                  )}
-                </>
-              )}
+                    {selectedDocumentType && (
+                      <p className="text-sm text-gray-500">
+                        Unterstützte Formate: {selectedType?.supportedFormats.join(', ').toUpperCase()}
+                        <br />
+                        Maximale Größe: {(selectedType?.maxFileSize || 0) / 1024 / 1024}MB
+                        {(isComparisonType || isRegistrationType) && (
+                          <>
+                            <br />
+                            Anzahl Dateien: {selectedType?.minFiles || 1} - {selectedType?.maxFiles || 3}
+                          </>
+                        )}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Error Display */}
         {error && (
@@ -477,12 +627,12 @@ const UploadPage: React.FC<UploadPageProps> = ({ documentTypes, onUpload, onComp
             {isUploading ? (
               <>
                 <LoadingSpinner />
-                <span>{isComparisonType ? 'Vergleiche...' : isRegistrationType ? 'Erfasse...' : 'Verarbeitung...'}</span>
+                <span>{isComparisonType ? 'Vergleiche...' : isRegistrationType ? 'Erfasse...' : isVerificationType ? 'Verifiziere...' : 'Verarbeitung...'}</span>
               </>
             ) : (
               <>
                 <FileText className="h-5 w-5" />
-                <span>{isComparisonType ? 'Angebote vergleichen' : isRegistrationType ? 'Angebote erfassen' : 'Daten extrahieren'}</span>
+                <span>{isComparisonType ? 'Angebote vergleichen' : isRegistrationType ? 'Angebote erfassen' : isVerificationType ? 'Dokumente verifizieren' : 'Daten extrahieren'}</span>
               </>
             )}
           </button>

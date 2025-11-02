@@ -336,3 +336,53 @@ export interface FileProcessingResult {
     message: string;
   };
 }
+
+// Verification Types
+export interface VerificationChecklistItem {
+  id: string;
+  label: string;
+  description: string;
+}
+
+export interface VerificationChecklist {
+  items: VerificationChecklistItem[];
+}
+
+export interface VerificationItemResult {
+  passed: boolean;
+  reason: string;
+}
+
+export interface VerificationResult {
+  documentType: string;
+  fileName: string;
+  verified: boolean;
+  checklist: Array<{
+    id: string;
+    label: string;
+    passed: boolean;
+    reason: string;
+  }>;
+  passedCount: number;
+  totalCount: number;
+  processingTime: number;
+  confidence?: number;
+}
+
+export interface VerificationResponse {
+  success: boolean;
+  data?: {
+    documents: VerificationResult[];
+    overallVerified: boolean;
+    totalProcessingTime: number;
+  };
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
+export interface DocumentVerificationRequest {
+  documentType: string;
+  file: Express.Multer.File;
+}

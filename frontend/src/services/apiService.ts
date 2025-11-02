@@ -3,6 +3,7 @@ import {
   UploadResponse,
   ComparisonResponse,
   RegistrationResponse,
+  VerificationResponse,
   DocumentTypesResponse,
   DocumentType,
   UploadRequest
@@ -301,6 +302,41 @@ export class ApiService {
     return documentType.supportedFormats
       .map(format => mimeTypes[format])
       .filter(Boolean);
+  }
+
+  /**
+   * Verify multiple documents
+   */
+  static async verifyDocuments(
+    documents: Array<{ file: File; documentType: string }>
+  ): Promise<VerificationResponse> {
+    try {
+      const formData = new FormData();
+      
+      // Append all files
+      documents.forEach((doc, index) => {
+        formData.append('documents', doc.file);
+        formData.append(`documentType${index}`, doc.documentType);
+      });
+      
+      // Also append as JSON array for convenience
+      formData.append('documentTypes', JSON.stringify(documents.map(d => d.documentType)));
+
+      const response: AxiosResponse<VerificationResponse> = await api.post('/verify', formData, {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = progressEvent.total
+            ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            : 0;
+          console.log(`Verification upload progress: ${percentCompleted}%`);
+        },
+        timeout: 180000, // 3 minutes for verification processing
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Verification upload error:', error);
+      throw error;
+    }
   }
 }
 

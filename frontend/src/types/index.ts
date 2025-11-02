@@ -360,3 +360,35 @@ export interface ErrorDisplayProps {
   onRetry?: () => void;
   onReset?: () => void;
 }
+
+// Verification Types
+export interface VerificationChecklistItem {
+  id: string;
+  label: string;
+  passed: boolean;
+  reason: string;
+}
+
+export interface VerificationResult {
+  documentType: string;
+  fileName: string;
+  verified: boolean;
+  checklist: VerificationChecklistItem[];
+  passedCount: number;
+  totalCount: number;
+  processingTime: number;
+  confidence?: number;
+}
+
+export interface VerificationResponse {
+  success: boolean;
+  data?: {
+    documents: VerificationResult[];
+    overallVerified: boolean;
+    totalProcessingTime: number;
+  };
+  error?: {
+    code: string;
+    message: string;
+  };
+}

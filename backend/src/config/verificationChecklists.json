@@ -1,0 +1,85 @@
+{
+  "austrian_passport": {
+    "items": [
+      {
+        "id": "format_layout",
+        "label": "Contains Austrian passport format/layout",
+        "description": "Document shows red cover, Austrian coat of arms, and standard passport design"
+      },
+      {
+        "id": "passport_number",
+        "label": "Has readable passport number",
+        "description": "Passport number is visible and in correct format (alphanumeric, typically 8-9 characters)"
+      },
+      {
+        "id": "photo",
+        "label": "Contains clear photo of passport holder",
+        "description": "Document includes a clear, identifiable photograph of the passport holder"
+      },
+      {
+        "id": "expiration_date",
+        "label": "Shows expiration date in valid format",
+        "description": "Expiration date is present and in valid date format (DD.MM.YYYY or similar)"
+      },
+      {
+        "id": "personal_info",
+        "label": "Contains personal information",
+        "description": "Document includes required personal information: name, date of birth, nationality"
+      }
+    ]
+  },
+  "austrian_id_card": {
+    "items": [
+      {
+        "id": "format_layout",
+        "label": "Has Austrian ID-card format",
+        "description": "Document shows credit-card size format with Austrian design elements"
+      },
+      {
+        "id": "id_number",
+        "label": "Contains readable ID number",
+        "description": "ID number is visible and in correct format for Austrian ID card"
+      },
+      {
+        "id": "personal_info",
+        "label": "Contains personal information",
+        "description": "Document includes required personal information: name, date of birth, nationality"
+      },
+      {
+        "id": "dates",
+        "label": "Shows expiration and issue dates in valid format",
+        "description": "Expiration date and issue date are present and in valid date format (DD.MM.YYYY or similar)"
+      }
+    ]
+  },
+  "real_estate_contract": {
+    "items": [
+      {
+        "id": "buyer_info",
+        "label": "Contains buyer information",
+        "description": "Document includes buyer's name, address, or company details"
+      },
+      {
+        "id": "seller_info",
+        "label": "Contains seller information",
+        "description": "Document includes seller's name, address, or company details"
+      },
+      {
+        "id": "property_address",
+        "label": "Has property address or object description",
+        "description": "Document contains property address or clear description of the real estate object"
+      },
+      {
+        "id": "purchase_price",
+        "label": "Contains purchase price",
+        "description": "Purchase price is clearly stated as a numeric value"
+      },
+      {
+        "id": "contract_details",
+        "label": "Includes contract date and/or notary information",
+        "description": "Document contains contract date and/or notary name/information"
+      }
+    ]
+  }
+}
+
