@@ -17,6 +17,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         return <Calculator className="h-6 w-6" />;
       case 'angebotserfassung':
         return <FileText className="h-6 w-6" />;
+      case 'document_verification':
+        return <FileText className="h-6 w-6" />;
       case 'invoice':
         return <FileText className="h-6 w-6" />;
       case 'receipt':
@@ -44,6 +46,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         return 'border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100';
       case 'angebotserfassung':
         return 'border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100';
+      case 'document_verification':
+        return 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100';
       case 'invoice':
         return 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100';
       case 'receipt':
@@ -67,6 +71,8 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
         return 'border-cyan-500 bg-cyan-100 text-cyan-800 ring-2 ring-cyan-300';
       case 'angebotserfassung':
         return 'border-teal-500 bg-teal-100 text-teal-800 ring-2 ring-teal-300';
+      case 'document_verification':
+        return 'border-amber-500 bg-amber-100 text-amber-800 ring-2 ring-amber-300';
       case 'invoice':
         return 'border-blue-500 bg-blue-100 text-blue-800 ring-2 ring-blue-300';
       case 'receipt':
@@ -81,7 +87,7 @@ const DocumentTypeSelector: React.FC<DocumentTypeSelectorProps> = ({
   };
 
   // Define the primary document types (enabled) and their order
-  const primaryTypes = ['kaufvertrag', 'angebotsvergleich', 'haushaltsrechnung', 'angebotserfassung'];
+  const primaryTypes = ['kaufvertrag', 'angebotsvergleich', 'haushaltsrechnung', 'angebotserfassung', 'document_verification'];
   
   // Sort document types: primary types first, then disabled ones
   const sortedDocumentTypes = [...documentTypes].sort((a, b) => {

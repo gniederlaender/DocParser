@@ -8,8 +8,19 @@ export class DocumentTypeService {
   private readonly promptsPath: string;
 
   constructor() {
-    this.configPath = path.join(__dirname, '../../src/config/documentTypes.json');
-    this.promptsPath = path.join(__dirname, '../../src/config/prompts');
+    // Resolve config path: works both in dev (src/) and production (dist/)
+    // From dist/services/ -> ../../src/config/ -> backend/src/config/
+    // From src/services/ -> ../config/ -> backend/src/config/
+    const isProduction = __dirname.includes('dist');
+    if (isProduction) {
+      this.configPath = path.join(__dirname, '../../src/config/documentTypes.json');
+      this.promptsPath = path.join(__dirname, '../../src/config/prompts');
+    } else {
+      this.configPath = path.join(__dirname, '../config/documentTypes.json');
+      this.promptsPath = path.join(__dirname, '../config/prompts');
+    }
+    
+    console.log(`📂 Loading document types from: ${this.configPath}`);
     this.loadDocumentTypes();
   }
 
@@ -19,13 +30,15 @@ export class DocumentTypeService {
         const configData = fs.readFileSync(this.configPath, 'utf-8');
         const config = JSON.parse(configData);
         this.documentTypes = config.documentTypes || [];
+        console.log(`✅ Loaded ${this.documentTypes.length} document types from config`);
       } else {
         // Create default document types if config doesn't exist
+        console.warn(`⚠️  Config file not found at ${this.configPath}, using defaults`);
         this.documentTypes = this.getDefaultDocumentTypes();
         this.saveDocumentTypes();
       }
     } catch (error) {
-      console.error('Error loading document types:', error);
+      console.error('❌ Error loading document types:', error);
       this.documentTypes = this.getDefaultDocumentTypes();
     }
   }
@@ -117,6 +130,16 @@ export class DocumentTypeService {
         maxFileSize: 15 * 1024 * 1024, // 15MB
         promptTemplate: 'angebotsvergleich_prompt.txt',
         maxFiles: 3,
+        minFiles: 1
+      },
+      {
+        id: 'document_verification',
+        name: 'Dokumenten-Verifizierung',
+        description: 'Mehrere Dokumente verschiedener Typen verifizieren (Pass, ID-Karte, Kaufvertrag)',
+        supportedFormats: ['pdf', 'png', 'jpg', 'jpeg'],
+        maxFileSize: 15 * 1024 * 1024, // 15MB
+        promptTemplate: '',
+        maxFiles: 10,
         minFiles: 1
       }
     ];

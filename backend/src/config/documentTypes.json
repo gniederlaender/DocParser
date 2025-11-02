@@ -93,6 +93,21 @@
       "promptTemplate": "angebotsvergleich_prompt.txt",
       "maxFiles": 3,
       "minFiles": 1
+    },
+    {
+      "id": "document_verification",
+      "name": "Dokumenten-Verifizierung",
+      "description": "Mehrere Dokumente verschiedener Typen verifizieren (Pass, ID-Karte, Kaufvertrag)",
+      "supportedFormats": [
+        "pdf",
+        "png",
+        "jpg",
+        "jpeg"
+      ],
+      "maxFileSize": 15728640,
+      "promptTemplate": "",
+      "maxFiles": 10,
+      "minFiles": 1
     }
   ],
   "lastUpdated": "2025-01-27T10:00:00.000Z"
