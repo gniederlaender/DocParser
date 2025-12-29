@@ -48,12 +48,14 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
       'auszahlungsbetrag': 'Auszahlungsbetrag',
       'auszahlungsdatum': 'Auszahlungsdatum',
       'datum1Rate': 'Datum 1. Rate',
+      'laufzeit': 'Laufzeit',
       'ratenanzahl': 'Ratenanzahl',
       'kreditende': 'Kreditende',
       'sondertilgungen': 'Sondertilgungen',
       'restwert': 'Restwert',
       'fixzinssatz': 'Fixzinssatz',
       'fixzinsperiode': 'Fixzinsperiode',
+      'fixzinssatz_in_jahren': 'Fixzinssatz in Jahren',
       'sollzinssatz': 'Anschlusskondition',
       'effektivzinssatz': 'Effektivzinssatz',
       'bearbeitungsgebuehr': 'Bearbeitungsgebühr',
@@ -104,6 +106,7 @@ const ComparisonDisplay: React.FC<ComparisonDisplayProps> = ({ data, onDownload,
                   <div><span className="font-medium">Anbieter:</span> {formatValue(offer.anbieter)}</div>
                   <div><span className="font-medium">Kreditbetrag:</span> {formatValue(offer.kreditbetrag)}</div>
                   <div><span className="font-medium">Auszahlungsbetrag:</span> {formatValue(offer.auszahlungsbetrag)}</div>
+                  <div><span className="font-medium">Laufzeit:</span> {formatValue(offer.laufzeit)}</div>
                   <div><span className="font-medium">Ratenanzahl:</span> {formatValue(offer.ratenanzahl)}</div>
                   <div><span className="font-medium">Fixzinssatz:</span> {formatValue(offer.fixzinssatz)}</div>
                 </div>

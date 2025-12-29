@@ -64,6 +64,26 @@ function calculateYearsBetweenDates(startDate: string, endDate: string): string 
   }
 }
 
+// Utility function to calculate fixzinssatz_in_jahren from fixzinsperiode
+function calculateFixzinssatzInJahren(angebotsdatum: string | undefined, fixzinsperiode: string | undefined): string | null {
+  if (!fixzinsperiode || fixzinsperiode === 'nicht angegeben') {
+    return null;
+  }
+
+  // Check if fixzinsperiode is already in years format (e.g., "7 Jahre", "10 Jahre")
+  const yearsMatch = fixzinsperiode.match(/(\d+)\s*Jahre?/i);
+  if (yearsMatch) {
+    return `${yearsMatch[1]} Jahre`;
+  }
+
+  // If fixzinsperiode is a date, calculate from angebotsdatum
+  if (angebotsdatum && angebotsdatum !== 'nicht angegeben') {
+    return calculateYearsBetweenDates(angebotsdatum, fixzinsperiode);
+  }
+
+  return null;
+}
+
 const router = express.Router();
 
 // Configure multer for memory storage
@@ -295,10 +315,14 @@ router.post('/upload/compare', uploadMultiple.array('files', 3), asyncHandler(as
         throw new AppError(`Invalid LLM response: ${validation.error}`, ErrorCode.INVALID_RESPONSE_FORMAT, 500);
       }
 
-      // Add file name to the extracted data
+      // Add file name to the extracted data and calculate fixzinssatz_in_jahren
       const offerData: LoanOfferData = {
         ...validation.parsedData,
-        fileName: file.originalname
+        fileName: file.originalname,
+        fixzinssatz_in_jahren: calculateFixzinssatzInJahren(
+          validation.parsedData.angebotsdatum,
+          validation.parsedData.fixzinsperiode
+        ) || 'nicht angegeben'
       };
 
       individualOffers.push(offerData);
@@ -464,10 +488,14 @@ router.post('/upload/register', uploadMultiple.array('files', 3), asyncHandler(a
         throw new AppError(`Invalid LLM response: ${validation.error}`, ErrorCode.INVALID_RESPONSE_FORMAT, 500);
       }
 
-      // Add file name to the extracted data
+      // Add file name to the extracted data and calculate fixzinssatz_in_jahren
       const offerData: LoanOfferData = {
         ...validation.parsedData,
-        fileName: file.originalname
+        fileName: file.originalname,
+        fixzinssatz_in_jahren: calculateFixzinssatzInJahren(
+          validation.parsedData.angebotsdatum,
+          validation.parsedData.fixzinsperiode
+        ) || 'nicht angegeben'
       };
 
       individualOffers.push(offerData);
@@ -496,12 +524,14 @@ router.post('/upload/register', uploadMultiple.array('files', 3), asyncHandler(a
       auszahlungsbetrag: offer.auszahlungsbetrag,
       auszahlungsdatum: offer.auszahlungsdatum,
       datum1Rate: offer.datum1Rate,
+      laufzeit: offer.laufzeit,
       ratenanzahl: offer.ratenanzahl,
       kreditende: offer.kreditende,
       sondertilgungen: offer.sondertilgungen,
       restwert: offer.restwert,
       fixzinssatz: offer.fixzinssatz,
       fixzinsperiode: offer.fixzinsperiode,
+      fixzinssatz_in_jahren: offer.fixzinssatz_in_jahren,
       sollzinssatz: offer.sollzinssatz,
       effektivzinssatz: offer.effektivzinssatz,
       bearbeitungsgebuehr: offer.bearbeitungsgebuehr,

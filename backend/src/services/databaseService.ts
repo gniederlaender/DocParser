@@ -14,6 +14,7 @@ export interface LoanOfferRecord {
   auszahlungsbetrag?: string;
   auszahlungsdatum?: string;
   datum1Rate?: string;
+  laufzeit?: string;
   ratenanzahl?: string;
   kreditende?: string;
   sondertilgungen?: string;
@@ -22,6 +23,7 @@ export interface LoanOfferRecord {
   // Zinskonditionen
   fixzinssatz?: string;
   fixzinsperiode?: string;
+  fixzinssatz_in_jahren?: string;
   sollzinssatz?: string;
   effektivzinssatz?: string;
   
@@ -89,6 +91,7 @@ export class DatabaseService {
         auszahlungsbetrag TEXT,
         auszahlungsdatum TEXT,
         datum1Rate TEXT,
+        laufzeit TEXT,
         ratenanzahl TEXT,
         kreditende TEXT,
         sondertilgungen TEXT,
@@ -130,6 +133,17 @@ export class DatabaseService {
       const Database = require('better-sqlite3');
       const db = new Database(this.dbPath);
       db.exec(sql);
+
+      try {
+        const columns = db.prepare(`PRAGMA table_info(loan_offers)`).all();
+        const hasLaufzeitColumn = columns.some((column: { name: string }) => column.name === 'laufzeit');
+        if (!hasLaufzeitColumn) {
+          db.exec(`ALTER TABLE loan_offers ADD COLUMN laufzeit TEXT`);
+        }
+      } catch (alterError) {
+        console.warn('Warning: Unable to ensure laufzeit column exists:', alterError);
+      }
+
       db.close();
     } catch (error) {
       console.error('Failed to create table:', error);
@@ -142,14 +156,18 @@ export class DatabaseService {
       const Database = require('better-sqlite3');
       const db = new Database(this.dbPath);
 
+      const columns = [
+        'fileName', 'anbieter', 'angebotsdatum', 'kreditbetrag', 'auszahlungsbetrag', 'auszahlungsdatum', 'datum1Rate', 'laufzeit',
+        'ratenanzahl', 'kreditende', 'sondertilgungen', 'restwert', 'fixzinssatz', 'fixzinsperiode', 'fixzinssatz_in_jahren', 'sollzinssatz',
+        'effektivzinssatz', 'bearbeitungsgebuehr', 'schaetzgebuehr', 'kontofuehrungsgebuehr', 'kreditpruefkosten',
+        'vermittlerentgelt', 'grundbucheintragungsgebuehr', 'grundbuchseingabegebuehr', 'grundbuchsauszug',
+        'grundbuchsgesuch', 'legalisierungsgebuehr', 'gesamtkosten', 'gesamtbetrag', 'monatsrate', 'rawJson', 'processingTime', 'confidence'
+      ];
+
+      const placeholders = columns.map(() => '?').join(', ');
       const insertSql = `
-        INSERT INTO loan_offers (
-          fileName, anbieter, angebotsdatum, kreditbetrag, auszahlungsbetrag, auszahlungsdatum, datum1Rate,
-          ratenanzahl, kreditende, sondertilgungen, restwert, fixzinssatz, fixzinsperiode, sollzinssatz,
-          effektivzinssatz, bearbeitungsgebuehr, schaetzgebuehr, kontofuehrungsgebuehr, kreditpruefkosten,
-          vermittlerentgelt, grundbucheintragungsgebuehr, grundbuchseingabegebuehr, grundbuchsauszug,
-          grundbuchsgesuch, legalisierungsgebuehr, gesamtkosten, gesamtbetrag, monatsrate, rawJson, processingTime, confidence
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO loan_offers (${columns.join(', ')})
+        VALUES (${placeholders})
       `;
 
       const stmt = db.prepare(insertSql);
@@ -165,12 +183,14 @@ export class DatabaseService {
             offer.auszahlungsbetrag || null,
             offer.auszahlungsdatum || null,
             offer.datum1Rate || null,
+            offer.laufzeit || null,
             offer.ratenanzahl || null,
             offer.kreditende || null,
             offer.sondertilgungen || null,
             offer.restwert || null,
             offer.fixzinssatz || null,
             offer.fixzinsperiode || null,
+            offer.fixzinssatz_in_jahren || null,
             offer.sollzinssatz || null,
             offer.effektivzinssatz || null,
             offer.bearbeitungsgebuehr || null,

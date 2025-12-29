@@ -196,6 +196,7 @@ export interface LoanOfferData {
   auszahlungsbetrag?: string;
   auszahlungsdatum?: string;
   datum1Rate?: string;
+  laufzeit?: string;
   ratenanzahl?: string;
   kreditende?: string;
   sondertilgungen?: string;
@@ -204,6 +205,7 @@ export interface LoanOfferData {
   // Zinskonditionen
   fixzinssatz?: string;
   fixzinsperiode?: string;
+  fixzinssatz_in_jahren?: string;
   sollzinssatz?: string;
   effektivzinssatz?: string;
   

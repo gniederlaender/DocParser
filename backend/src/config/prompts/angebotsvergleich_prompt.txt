@@ -7,6 +7,7 @@ Kreditdaten:
 - Auszahlungsbetrag: Der tatsächlich ausgezahlte Betrag (kann vom Kreditbetrag abweichen)
 - Auszahlungsdatum: Das Datum der Auszahlung
 - Datum 1. Rate: Das Datum der ersten Rate
+- Laufzeit: Die gesamte Laufzeit des Kredits (z. B. in Jahren oder Monaten)
 - Ratenanzahl: Die Gesamtanzahl der Ratenzahlungen
 - Kreditende / letzte Rate: Das Datum der letzten Rate oder Kreditende
 - Sondertilgungen: Informationen zu Sondertilgungsmöglichkeiten
@@ -52,6 +53,7 @@ Geben Sie die Daten als JSON-Objekt zurück mit folgenden Feldern:
   "auszahlungsbetrag": "string",
   "auszahlungsdatum": "string",
   "datum1Rate": "string",
+  "laufzeit": "string",
   "ratenanzahl": "string",
   "kreditende": "string",
   "sondertilgungen": "string",

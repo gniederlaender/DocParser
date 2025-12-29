@@ -10,6 +10,7 @@ Kreditdaten:
 - Auszahlungsbetrag
 - Auszahlungsdatum
 - Datum 1. Rate
+- Laufzeit
 - Ratenanzahl
 - Kreditende / letzte Rate
 - Sondertilgungen
@@ -58,6 +59,7 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
       "auszahlungsbetrag": "string",
       "auszahlungsdatum": "string",
       "datum1Rate": "string",
+      "laufzeit": "string",
       "ratenanzahl": "string",
       "kreditende": "string",
       "sondertilgungen": "string",
@@ -88,7 +90,7 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
       {"type": "section", "title": "Anbieter & Grunddaten"},
       "anbieter", "angebotsdatum",
       {"type": "section", "title": "Kreditdaten"},
-      "kreditbetrag", "auszahlungsbetrag", "auszahlungsdatum", "datum1Rate", "ratenanzahl", "kreditende", "sondertilgungen", "restwert", "monatsrate",
+      "kreditbetrag", "auszahlungsbetrag", "auszahlungsdatum", "datum1Rate", "laufzeit", "ratenanzahl", "kreditende", "sondertilgungen", "restwert", "monatsrate",
       {"type": "section", "title": "Zinskonditionen"},
       "fixzinssatz", "fixzinsperiode", "sollzinssatz", "effektivzinssatz",
       {"type": "section", "title": "Gebühren & Kosten"},
@@ -100,6 +102,7 @@ Geben Sie die Vergleichsdaten als JSON-Objekt zurück:
         "auszahlungsbetrag": "string",
         "auszahlungsdatum": "string",
         "datum1Rate": "string",
+        "laufzeit": "string",
         "ratenanzahl": "string",
         "kreditende": "string",
         "sondertilgungen": "string",
