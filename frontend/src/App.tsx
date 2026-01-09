@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import UploadPage from './components/UploadPage';
+import AdminPage from './components/AdminPage';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorDisplay from './components/ErrorDisplay';
 import { DocumentType, UploadResponse, ComparisonResponse } from './types';
 import ApiService from './services/apiService';
+import { Settings } from 'lucide-react';
+
+type Page = 'upload' | 'admin';
 
 const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<Page>('upload');
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,6 +131,29 @@ const App: React.FC = () => {
               <div className="text-sm text-gray-500">
                 {documentTypes.length} Dokumententypen verfügbar
               </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setCurrentPage('upload')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    currentPage === 'upload'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Upload
+                </button>
+                <button
+                  onClick={() => setCurrentPage('admin')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${
+                    currentPage === 'admin'
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <Settings className="h-4 w-4" />
+                  Verwaltung
+                </button>
+              </div>
               <div className="flex items-center">
                 <div className="h-2 w-2 bg-success-500 rounded-full"></div>
                 <span className="ml-2 text-sm text-success-600">Verbunden</span>
@@ -137,11 +165,15 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <UploadPage
-          documentTypes={documentTypes}
-          onUpload={handleUpload}
-          onCompare={handleCompare}
-        />
+        {currentPage === 'upload' ? (
+          <UploadPage
+            documentTypes={documentTypes}
+            onUpload={handleUpload}
+            onCompare={handleCompare}
+          />
+        ) : (
+          <AdminPage />
+        )}
       </main>
 
       {/* Toast Notifications */}

@@ -338,6 +338,92 @@ export class ApiService {
       throw error;
     }
   }
+
+  /**
+   * Admin API Methods
+   */
+
+  /**
+   * Get all loan offers
+   */
+  static async getAllLoanOffers(): Promise<any[]> {
+    try {
+      const response: AxiosResponse<{ success: boolean; data: any[] }> = await api.get('/admin/offers');
+      
+      if (!response.data.success || !response.data.data) {
+        throw new Error('Failed to fetch loan offers');
+      }
+
+      return response.data.data;
+    } catch (error: any) {
+      console.error('Get all loan offers error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get single loan offer by ID
+   */
+  static async getLoanOfferById(id: number): Promise<any> {
+    try {
+      const response: AxiosResponse<{ success: boolean; data: any }> = await api.get(`/admin/offers/${id}`);
+      
+      if (!response.data.success || !response.data.data) {
+        throw new Error(`Loan offer with ID ${id} not found`);
+      }
+
+      return response.data.data;
+    } catch (error: any) {
+      console.error('Get loan offer error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create new loan offer
+   */
+  static async createLoanOffer(offerData: any): Promise<{ success: boolean; message: string }> {
+    try {
+      // Change Content-Type for JSON
+      const response: AxiosResponse<{ success: boolean; message: string }> = await api.post('/admin/offers', offerData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.data.success) {
+        throw new Error('Failed to create loan offer');
+      }
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Create loan offer error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update existing loan offer
+   */
+  static async updateLoanOffer(id: number, offerData: any): Promise<{ success: boolean; message: string; data: any }> {
+    try {
+      // Change Content-Type for JSON
+      const response: AxiosResponse<{ success: boolean; message: string; data: any }> = await api.put(`/admin/offers/${id}`, offerData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.data.success) {
+        throw new Error('Failed to update loan offer');
+      }
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Update loan offer error:', error);
+      throw error;
+    }
+  }
 }
 
 export default ApiService;

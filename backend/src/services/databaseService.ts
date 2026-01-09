@@ -287,6 +287,97 @@ export class DatabaseService {
       return { totalOffers: 0, totalFiles: 0 };
     }
   }
+
+  public async updateLoanOffer(id: number, offer: Partial<LoanOfferRecord>): Promise<{ success: boolean; error?: string }> {
+    try {
+      const Database = require('better-sqlite3');
+      const db = new Database(this.dbPath);
+
+      // Build update query dynamically based on provided fields
+      const updateFields: string[] = [];
+      const values: any[] = [];
+
+      // List of all updatable fields (excluding id, rawJson, processingTime, confidence, createdAt)
+      const updatableFields = [
+        'fileName', 'anbieter', 'angebotsdatum', 'kreditbetrag', 'auszahlungsbetrag', 
+        'auszahlungsdatum', 'datum1Rate', 'laufzeit', 'ratenanzahl', 'kreditende', 
+        'sondertilgungen', 'restwert', 'fixzinssatz', 'fixzinsperiode', 'fixzinssatz_in_jahren', 
+        'sollzinssatz', 'effektivzinssatz', 'bearbeitungsgebuehr', 'schaetzgebuehr', 
+        'kontofuehrungsgebuehr', 'kreditpruefkosten', 'vermittlerentgelt', 
+        'grundbucheintragungsgebuehr', 'grundbuchseingabegebuehr', 'grundbuchsauszug', 
+        'grundbuchsgesuch', 'legalisierungsgebuehr', 'gesamtkosten', 'gesamtbetrag', 'monatsrate'
+      ];
+
+      for (const field of updatableFields) {
+        if (field in offer) {
+          updateFields.push(`${field} = ?`);
+          values.push(offer[field as keyof LoanOfferRecord] || null);
+        }
+      }
+
+      // Update rawJson if any field was updated
+      if (updateFields.length > 0) {
+        // Get current record to merge with updates
+        const currentRecord = await this.getLoanOfferById(id);
+        if (!currentRecord) {
+          db.close();
+          return { success: false, error: 'Offer not found' };
+        }
+
+        // Merge updates with current record
+        const updatedRecord = { ...currentRecord, ...offer };
+        updateFields.push('rawJson = ?');
+        values.push(JSON.stringify(updatedRecord));
+      }
+
+      if (updateFields.length === 0) {
+        db.close();
+        return { success: false, error: 'No fields to update' };
+      }
+
+      values.push(id);
+
+      const updateSql = `
+        UPDATE loan_offers 
+        SET ${updateFields.join(', ')}
+        WHERE id = ?
+      `;
+
+      const stmt = db.prepare(updateSql);
+      const result = stmt.run(...values);
+
+      db.close();
+
+      if (result.changes === 0) {
+        return { success: false, error: 'No rows updated' };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Database update error:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown database error' 
+      };
+    }
+  }
+
+  public async getAllLoanOffers(): Promise<LoanOfferRecord[]> {
+    try {
+      const Database = require('better-sqlite3');
+      const db = new Database(this.dbPath);
+
+      const selectSql = `SELECT * FROM loan_offers ORDER BY createdAt DESC`;
+      const stmt = db.prepare(selectSql);
+      const results = stmt.all();
+      db.close();
+
+      return results;
+    } catch (error) {
+      console.error('Database query error:', error);
+      throw new AppError('Failed to retrieve loan offers', ErrorCode.NETWORK_ERROR, 500);
+    }
+  }
 }
 
 // Export singleton instance (lazy initialization)

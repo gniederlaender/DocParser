@@ -10,6 +10,7 @@ import path from 'path';
 import uploadRoutes from './routes/upload';
 import documentTypeRoutes from './routes/documentTypes';
 import verifyRoutes from './routes/verify';
+import adminRoutes from './routes/admin';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -84,6 +85,7 @@ app.get('/health', (req, res) => {
 app.use('/api', uploadRoutes);
 app.use('/api', documentTypeRoutes);
 app.use('/api', verifyRoutes);
+app.use('/api', adminRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
